@@ -1,9 +1,10 @@
 import cron from "node-cron";
 import dotenv from "dotenv";
+import http from "http";
+import axios from "axios";
 
 dotenv.config();
 
-import axios from "axios";
 import { PINCODES, PLATFORMS } from "./config.js";
 import { callStockAPI, attachCustomRequest } from "./services/apiClient.js";
 import { applePickupCheck } from "./services/apiClient.js";
@@ -531,3 +532,27 @@ checkStock().catch((e) =>
 
 // Export attachCustomRequest for runtime wiring (useful during tests)
 export { attachCustomRequest };
+
+// Simple HTTP server for Render health checks (keeps service alive)
+const PORT = process.env.PORT || 3000;
+
+const server = http.createServer((req, res) => {
+  if (req.url === "/health" || req.url === "/") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        status: "ok",
+        service: "ecommerce-tracker",
+        timestamp: new Date().toISOString(),
+      })
+    );
+  } else {
+    res.writeHead(404);
+    res.end("Not Found");
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log("Tracking bot is active!");
+});

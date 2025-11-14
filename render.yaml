@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ecommerce-tracker
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    # Add your environment variables in Render dashboard:
+    # - TELEGRAM_BOT_TOKEN
+    # - TELEGRAM_CHAT_ID
+    # - APPLE_PROXIES (optional)

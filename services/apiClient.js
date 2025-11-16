@@ -81,6 +81,7 @@ export const callStockAPI = async (platform, pincode, code) => {
 const cromaCustomRequest = async ({ pincode, code, axios }) => {
   // Ensure pincode is a string (Python passes it as string)
   const pincodeStr = String(pincode);
+  const retryCount = 2;
 
   const requestBody = {
     promise: {

@@ -77,11 +77,37 @@ export const callStockAPI = async (platform, pincode, code) => {
   }
 };
 
-// Custom request function for Croma - SIMPLIFIED (based on working Python code)
-const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
+// Custom request function for Croma - FIXED with all required headers
+const cromaCustomRequest = async ({ pincode, code, axios, retryCount = 0 }) => {
   // Ensure pincode is a string (Python passes it as string)
   const pincodeStr = String(pincode);
   const maxRetries = 2;
+
+  // Get Croma platform config to use ALL headers (required to bypass Akamai WAF)
+  const cromaPlatform = PLATFORMS.find((p) => p.name === "Croma");
+  const headers = cromaPlatform?.headers || {
+    accept: "application/json, text/plain, */*",
+    "accept-language": "en-US,en;q=0.9",
+    accesstoken: "2fe360a8-442f-4881-9b30-451c1643c339",
+    client_id: "CROMA-WEB-APP",
+    "content-type": "application/json",
+    csc_code: "null",
+    customerhash: "3256e9210dc30c675fefe93551b083e3",
+    "oms-apim-subscription-key": "1131858141634e2abe2efb2b3a2a2a5d",
+    origin: "https://www.croma.com",
+    priority: "u=1, i",
+    referer: "https://www.croma.com/",
+    "sec-ch-ua": '"Chromium";v="142", "Brave";v="142", "Not_A Brand";v="99"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-site",
+    "sec-gpc": "1",
+    source: "null",
+    "user-agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+  };
 
   const requestBody = {
     promise: {
@@ -93,7 +119,7 @@ const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
         promiseLine: [
           {
             fulfillmentType: "HDEL",
-            itemID: String(code), // Ensure code is string
+            itemID: String(code),
             lineId: "1",
             requiredQty: "1",
             shipToAddress: {
@@ -113,21 +139,15 @@ const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
       "https://api.croma.com/inventory/oms/v2/tms/details-pwa/",
       requestBody,
       {
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          "oms-apim-subscription-key": "1131858141634e2abe2efb2b3a2a2a5d",
-          origin: "https://www.croma.com",
-          referer: "https://www.croma.com/",
-        },
+        headers: headers,
         timeout: 10_000,
       }
     );
     return res.data;
   } catch (err) {
     console.error(
-      `Croma API error for product ${code}, pincode ${pincode}:`,
-      err
+      `[Croma] API error for product ${code}, pincode ${pincode}:`,
+      err.message
     );
 
     if (
@@ -135,9 +155,10 @@ const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
       err.response.status === 403 &&
       retryCount < maxRetries
     ) {
-      const delay = (retryCount + 1) * 2000; // 5s, 10s delays
+      const delay = (retryCount + 1) * 2000;
+      // FIX: Use backticks for template literal
       console.log(
-        "Croma rate limited (403) for product ${code}, retrying after ${delay}ms..."
+        `[Croma] Rate limited (403) for product ${code}, retrying after ${delay}ms...`
       );
       await new Promise((resolve) => setTimeout(resolve, delay));
       return cromaCustomRequest({
@@ -149,16 +170,27 @@ const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
     }
 
     if (err.response) {
-      console.error("Response status:", err.response.status);
-      console.error("Response headers:", err.response.headers);
+      console.error(`[Croma] Response status: ${err.response.status}`);
       if (err.response.data) {
-        console.error(
-          "Response data:",
-          JSON.stringify(err.response.data, null, 2)
-        );
+        // Check if it's an Akamai block
+        const responseText =
+          typeof err.response.data === "string"
+            ? err.response.data
+            : JSON.stringify(err.response.data);
+        if (
+          responseText.includes("Access Denied") ||
+          responseText.includes("edgesuite.net")
+        ) {
+          console.error(
+            `[Croma] ⚠️ BLOCKED BY AKAMAI WAF - Missing browser headers or IP flagged`
+          );
+        }
+        console.error("Response data:", responseText.substring(0, 500));
       }
     } else if (err.request) {
-      console.error("Request made but no response received:", err.request);
+      console.error(
+        `[Croma] Network error - no response received. Code: ${err.code}`
+      );
     }
     return null;
   }

@@ -124,11 +124,29 @@ const cromaCustomRequest = async ({ pincode, code, axios }) => {
     );
     return res.data;
   } catch (err) {
-    // Enhanced error logging to see actual API response
     console.error(
       `Croma API error for product ${code}, pincode ${pincode}:`,
-      err.message
+      err
     );
+
+    if (
+      err.response &&
+      err.response.status === 403 &&
+      retryCount < maxRetries
+    ) {
+      const delay = (retryCount + 1) * 2000; // 5s, 10s delays
+      console.log(
+        "Croma rate limited (403) for product ${code}, retrying after ${delay}ms..."
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return cromaCustomRequest({
+        pincode,
+        code,
+        axios,
+        retryCount: retryCount + 1,
+      });
+    }
+
     if (err.response) {
       console.error("Response status:", err.response.status);
       console.error("Response headers:", err.response.headers);

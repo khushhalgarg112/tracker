@@ -28,7 +28,7 @@ const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 const getProductLink = (platformName, productId, productUrl) => {
   // Use productUrl if available (from config)
   if (productUrl) return productUrl;
-  
+
   if (platformName === "Croma") {
     return `https://www.croma.com/product-details?pid=${productId}`;
   }
@@ -211,18 +211,21 @@ const getFlipkartAvailabilityDetails = (code, resData) => {
       console.log(`[Flipkart] No RESPONSE found for product ${code}`);
       return null;
     }
-    
+
     const listing = response.listingSummary || {};
-    
+
     // Check both 'available' and 'serviceable' fields
     // Product is available if either is true
-    const isAvailable = listing.available === true || listing.serviceable === true;
-    
+    const isAvailable =
+      listing.available === true || listing.serviceable === true;
+
     // Get price
     const price = listing.pricing?.finalPrice?.decimalValue || null;
-    
-    console.log(`[Flipkart] Product ${code} - available: ${listing.available}, serviceable: ${listing.serviceable}, isAvailable: ${isAvailable}`);
-    
+
+    console.log(
+      `[Flipkart] Product ${code} - available: ${listing.available}, serviceable: ${listing.serviceable}, isAvailable: ${isAvailable}`
+    );
+
     return {
       available: isAvailable,
       price: price,
@@ -239,13 +242,16 @@ const getRelianceDigitalAvailabilityDetails = (code, resData) => {
   try {
     const articles = resData.data?.articles || [];
     if (articles.length === 0) return null;
-    
+
     const article = articles[0];
     const error = article.error || {};
     const errorType = error.type;
-    
+
     return {
-      available: !(errorType && ["OutOfStockError", "FaultyArticleError"].includes(errorType)),
+      available: !(
+        errorType &&
+        ["OutOfStockError", "FaultyArticleError"].includes(errorType)
+      ),
       errorMessage: error.message || null,
     };
   } catch (err) {
@@ -258,10 +264,10 @@ const getRelianceDigitalAvailabilityDetails = (code, resData) => {
 const getIqooVivoAvailabilityDetails = (resData) => {
   try {
     if (resData.success !== "1" || !resData.data) return null;
-    
+
     const skuList = resData.data.activitySkuList || [];
     let isInStock = false;
-    
+
     for (const sku of skuList) {
       const reservableId = sku.activityInfo?.reservableId;
       if (reservableId === -1) {
@@ -269,7 +275,7 @@ const getIqooVivoAvailabilityDetails = (resData) => {
         break;
       }
     }
-    
+
     return { available: isInStock };
   } catch (err) {
     console.error("Error parsing iQOO/Vivo availability:", err.message);
@@ -282,14 +288,15 @@ const getAmazonAvailabilityDetails = (resData) => {
   try {
     const items = resData.ItemsResult?.Items || [];
     if (items.length === 0) return null;
-    
+
     const item = items[0];
     const listing = item.OffersV2?.Listings?.[0];
     const availability = listing?.Availability || {};
-    
+
     return {
-      available: availability.Type === "IN_STOCK" || 
-                availability.Message?.toLowerCase().includes("in stock"),
+      available:
+        availability.Type === "IN_STOCK" ||
+        availability.Message?.toLowerCase().includes("in stock"),
       message: availability.Message || "Status Unknown",
     };
   } catch (err) {
@@ -335,7 +342,10 @@ const detectAvailability = (platformName, code, pincode, resData) => {
 
   // Reliance Digital-specific detection
   if (platformName === "Reliance Digital") {
-    const availabilityDetails = getRelianceDigitalAvailabilityDetails(code, resData);
+    const availabilityDetails = getRelianceDigitalAvailabilityDetails(
+      code,
+      resData
+    );
     return availabilityDetails?.available === true;
   }
 
@@ -362,7 +372,8 @@ const detectAvailability = (platformName, code, pincode, resData) => {
     if (resData.available === true) return true;
     if (resData.inStock === true) return true;
     if (typeof resData.qty === "number" && resData.qty > 0) return true;
-    if (typeof resData.quantity === "number" && resData.quantity > 0) return true;
+    if (typeof resData.quantity === "number" && resData.quantity > 0)
+      return true;
     if (
       resData.data &&
       (resData.data.available === true ||
@@ -469,7 +480,7 @@ const checkAppleStock = async () => {
 // Separate function to check platforms without pincode (iQOO, Vivo)
 const checkPlatformsWithoutPincode = async () => {
   const platformsWithoutPincode = ["iQOO", "Vivo"]; // Removed "Amazon" - disabled
-  
+
   for (const platform of PLATFORMS) {
     if (!platformsWithoutPincode.includes(platform.name)) continue;
     if (!platform.products || platform.products.length === 0) continue;
@@ -481,7 +492,7 @@ const checkPlatformsWithoutPincode = async () => {
 
       try {
         let data;
-        
+
         // Remove Amazon check - only iQOO and Vivo
         // iQOO and Vivo
         if (typeof platform.customRequest === "function") {
@@ -498,7 +509,11 @@ const checkPlatformsWithoutPincode = async () => {
         );
 
         if (available) {
-          const productLink = getProductLink(platform.name, productId, productUrl);
+          const productLink = getProductLink(
+            platform.name,
+            productId,
+            productUrl
+          );
           let text = `✅ *Stock Alert*\nPlatform: ${platform.name}\nProduct: [${productName}](${productLink})\n`;
 
           console.log("ALERT ->", platform.name, productId);
@@ -530,14 +545,15 @@ const checkStock = async () => {
   for (const platform of PLATFORMS) {
     // Skip Apple, Amazon as they're disabled, and iQOO, Vivo as they're handled separately
     if (["Apple", "Amazon", "iQOO", "Vivo"].includes(platform.name)) continue;
-    
+
     // Also skip if platform has no products
     if (!platform.products || platform.products.length === 0) continue;
 
     // Get platform-specific pincodes, fallback to global PINCODES if not specified
-    const platformPincodes = platform.pincodes && platform.pincodes.length > 0 
-      ? platform.pincodes 
-      : PINCODES; // Fallback to global PINCODES
+    const platformPincodes =
+      platform.pincodes && platform.pincodes.length > 0
+        ? platform.pincodes
+        : PINCODES; // Fallback to global PINCODES
 
     // Skip if no pincodes configured
     if (!platformPincodes || platformPincodes.length === 0) {
@@ -561,7 +577,11 @@ const checkStock = async () => {
           );
 
           if (available) {
-            const productLink = getProductLink(platform.name, productId, productUrl);
+            const productLink = getProductLink(
+              platform.name,
+              productId,
+              productUrl
+            );
             let text = `✅ *Stock Alert*\nPlatform: ${platform.name}\nProduct: [${productName}](${productLink})\n📍 Pincode: ${pincode}`;
 
             // For Samsung, extract availability details
@@ -686,12 +706,14 @@ const checkStock = async () => {
             }
             // For Reliance Digital
             else if (platform.name === "Reliance Digital") {
-              const details = getRelianceDigitalAvailabilityDetails(productId, data);
+              const details = getRelianceDigitalAvailabilityDetails(
+                productId,
+                data
+              );
               if (details?.errorMessage) {
                 text += `\n⚠️ Note: ${details.errorMessage}`;
               }
-            }
-            else {
+            } else {
               text += `\nResponse: ${JSON.stringify(data)}`;
             }
 
@@ -724,7 +746,7 @@ const checkStock = async () => {
 // });
 
 // Cron: Other platforms every 2 minutes (Apple and Amazon disabled)
-cron.schedule("*/2  * * * *", () => {
+cron.schedule("*/10  * * * * *", () => {
   checkStock().catch((e) => console.error("checkStock failed:", e.message));
 });
 
@@ -762,5 +784,3 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log("Tracking bot is active!");
 });
-
-

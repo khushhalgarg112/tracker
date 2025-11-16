@@ -346,7 +346,7 @@ const checkStock = async () => {
   console.log("Starting stock sweep at", new Date().toISOString());
 
   // Check Apple separately (no pincode iteration)
-  await checkAppleStock();
+  // await checkAppleStock();
 
   // Check other platforms with pincode iteration
   for (const platform of PLATFORMS) {
@@ -518,7 +518,7 @@ const checkStock = async () => {
 // });
 
 // Cron: Other platforms every 5 minutes
-cron.schedule("*/5 * * * *", () => {
+cron.schedule("*/2  * * * *", () => {
   checkStock().catch((e) => console.error("checkStock failed:", e.message));
 });
 

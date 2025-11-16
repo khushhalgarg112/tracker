@@ -1,14 +1,6 @@
 // Central configuration. Keep PINCODES as a single shared array & products per platform.
 
-export const PINCODES = [
-  "122001",
-  "125121",
-  "125050",
-  "127021",
-  "126113",
-  "125033",
-  "136027",
-];
+export const PINCODES = ["122001"];
 // PLATFORMS array - fill apiUrl/method/apiKey as you need. We'll modify apiClient later per your cURLs.
 
 export const PLATFORMS = [
@@ -23,13 +15,13 @@ export const PLATFORMS = [
       { id: "317396", name: "Apple iPhone 17 256GB Black" },
       { id: "317403", name: "Apple iPhone 17 256GB Sage" },
       { id: "317401", name: "Apple iPhone 17 256GB Lavender" },
-      { id: "316364", name: "Vivo Y400 Pro 5G 8GB RAM 128GB Nebula Purple" },
-      { id: "316361", name: "Vivo Y400 Pro 5G 8GB RAM 128GB Freestyle White" },
-      { id: "316362", name: "Vivo Y400 Pro 5G 8GB RAM 128GB Fest Gold" },
       { id: "316303", name: "Oppo K13X 5G 4GB RAM 128GB Sunset Peach" },
       { id: "312574", name: "Vivo Y29 5G 4GB RAM 128GB Glacier Blue" },
       { id: "312575", name: "Vivo Y29 5G 4GB RAM 128GB Diamond Black" },
       { id: "312577", name: "Vivo Y29 5G 4GB RAM 128GB Titanium Gold" },
+      { id: "314881", name: "Pixel 9a" },
+      { id: "314882", name: "PIxel 9a" },
+      { id: "314883", name: "PIxel 9a" },
     ],
     // Croma-specific headers
     headers: {
@@ -61,7 +53,7 @@ export const PLATFORMS = [
     apiUrl: "https://www.samsung.com/in/api/v4/configurator/serviceability",
     method: "GET",
     apiKey: null,
-    products: [{ id: "SM-X926BZAA", name: "Galaxy Tab S10 Ultra" }],
+    products: [],
   },
   {
     name: "Apple",

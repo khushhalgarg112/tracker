@@ -25,18 +25,33 @@ When you paste cURLs I'll wire exact detection per platform.
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
 // Helper function to generate product links
-const getProductLink = (platformName, productId) => {
+const getProductLink = (platformName, productId, productUrl) => {
+  // Use productUrl if available (from config)
+  if (productUrl) return productUrl;
+  
   if (platformName === "Croma") {
-    // Croma product link format
     return `https://www.croma.com/product-details?pid=${productId}`;
   }
   if (platformName === "Samsung") {
-    // Samsung product link format - using modelCode pattern
     return `https://www.samsung.com/in/tablets/galaxy-tab-s10/buy/?modelCode=${productId}INS`;
   }
   if (platformName === "Apple") {
-    // Apple product link - using part number
     return `https://www.apple.com/in/shop/buy-iphone/iphone-17`;
+  }
+  if (platformName === "Flipkart") {
+    return `https://www.flipkart.com/product/p?pid=${productId}`;
+  }
+  if (platformName === "Reliance Digital") {
+    return `https://www.reliancedigital.in/product-details?articleId=${productId}`;
+  }
+  if (platformName === "iQOO") {
+    return `https://mshop.iqoo.com/in/product/${productId}`;
+  }
+  if (platformName === "Vivo") {
+    return `https://mshop.vivo.com/in/product/${productId}`;
+  }
+  if (platformName === "Amazon") {
+    return `https://www.amazon.in/dp/${productId}`;
   }
   // Default fallback
   return `Product ID: ${productId}`;
@@ -188,10 +203,105 @@ const getSamsungAvailabilityDetails = (code, resData) => {
   return availabilityDetails;
 };
 
+// Helper function to get Flipkart availability details
+const getFlipkartAvailabilityDetails = (code, resData) => {
+  try {
+    const response = resData.RESPONSE?.[code];
+    if (!response) {
+      console.log(`[Flipkart] No RESPONSE found for product ${code}`);
+      return null;
+    }
+    
+    const listing = response.listingSummary || {};
+    
+    // Check both 'available' and 'serviceable' fields
+    // Product is available if either is true
+    const isAvailable = listing.available === true || listing.serviceable === true;
+    
+    // Get price
+    const price = listing.pricing?.finalPrice?.decimalValue || null;
+    
+    console.log(`[Flipkart] Product ${code} - available: ${listing.available}, serviceable: ${listing.serviceable}, isAvailable: ${isAvailable}`);
+    
+    return {
+      available: isAvailable,
+      price: price,
+    };
+  } catch (err) {
+    console.error("Error parsing Flipkart availability:", err.message);
+    console.error("Response data:", JSON.stringify(resData, null, 2));
+    return null;
+  }
+};
+
+// Helper function to get Reliance Digital availability details
+const getRelianceDigitalAvailabilityDetails = (code, resData) => {
+  try {
+    const articles = resData.data?.articles || [];
+    if (articles.length === 0) return null;
+    
+    const article = articles[0];
+    const error = article.error || {};
+    const errorType = error.type;
+    
+    return {
+      available: !(errorType && ["OutOfStockError", "FaultyArticleError"].includes(errorType)),
+      errorMessage: error.message || null,
+    };
+  } catch (err) {
+    console.error("Error parsing Reliance Digital availability:", err.message);
+    return null;
+  }
+};
+
+// Helper function to get iQOO/Vivo availability details
+const getIqooVivoAvailabilityDetails = (resData) => {
+  try {
+    if (resData.success !== "1" || !resData.data) return null;
+    
+    const skuList = resData.data.activitySkuList || [];
+    let isInStock = false;
+    
+    for (const sku of skuList) {
+      const reservableId = sku.activityInfo?.reservableId;
+      if (reservableId === -1) {
+        isInStock = true;
+        break;
+      }
+    }
+    
+    return { available: isInStock };
+  } catch (err) {
+    console.error("Error parsing iQOO/Vivo availability:", err.message);
+    return null;
+  }
+};
+
+// Helper function to get Amazon availability details
+const getAmazonAvailabilityDetails = (resData) => {
+  try {
+    const items = resData.ItemsResult?.Items || [];
+    if (items.length === 0) return null;
+    
+    const item = items[0];
+    const listing = item.OffersV2?.Listings?.[0];
+    const availability = listing?.Availability || {};
+    
+    return {
+      available: availability.Type === "IN_STOCK" || 
+                availability.Message?.toLowerCase().includes("in stock"),
+      message: availability.Message || "Status Unknown",
+    };
+  } catch (err) {
+    console.error("Error parsing Amazon availability:", err.message);
+    return null;
+  }
+};
+
 const detectAvailability = (platformName, code, pincode, resData) => {
   if (!resData) return false;
 
-  // Apple-specific detection - check for pickup availability
+  // Apple-specific detection
   if (platformName === "Apple") {
     const availableStores = getApplePickupAvailability(code, resData);
     return availableStores.length > 0;
@@ -200,7 +310,6 @@ const detectAvailability = (platformName, code, pincode, resData) => {
   // Samsung-specific detection
   if (platformName === "Samsung") {
     const availabilityDetails = getSamsungAvailabilityDetails(code, resData);
-    // Stock is available if there are serviceable dealers, stores, or delivery modes
     return (
       availabilityDetails.localDealers.length > 0 ||
       availabilityDetails.stores.length > 0 ||
@@ -208,10 +317,9 @@ const detectAvailability = (platformName, code, pincode, resData) => {
     );
   }
 
-  // Croma-specific detection - check all 3 fulfillment types
+  // Croma-specific detection
   if (platformName === "Croma") {
     const availabilityDetails = getCromaAvailabilityDetails(code, resData);
-    // Return true if any fulfillment type has stock
     return (
       availabilityDetails.HDEL?.available ||
       availabilityDetails.STOR?.available ||
@@ -219,35 +327,51 @@ const detectAvailability = (platformName, code, pincode, resData) => {
     );
   }
 
+  // Flipkart-specific detection
+  if (platformName === "Flipkart") {
+    const availabilityDetails = getFlipkartAvailabilityDetails(code, resData);
+    return availabilityDetails?.available === true;
+  }
+
+  // Reliance Digital-specific detection
+  if (platformName === "Reliance Digital") {
+    const availabilityDetails = getRelianceDigitalAvailabilityDetails(code, resData);
+    return availabilityDetails?.available === true;
+  }
+
+  // iQOO-specific detection
+  if (platformName === "iQOO") {
+    const availabilityDetails = getIqooVivoAvailabilityDetails(resData);
+    return availabilityDetails?.available === true;
+  }
+
+  // Vivo-specific detection
+  if (platformName === "Vivo") {
+    const availabilityDetails = getIqooVivoAvailabilityDetails(resData);
+    return availabilityDetails?.available === true;
+  }
+
+  // Amazon-specific detection
+  if (platformName === "Amazon") {
+    const availabilityDetails = getAmazonAvailabilityDetails(resData);
+    return availabilityDetails?.available === true;
+  }
+
   // Common patterns for other platforms
   if (typeof resData === "object") {
-    // common flag
     if (resData.available === true) return true;
     if (resData.inStock === true) return true;
-
-    // numeric qty
     if (typeof resData.qty === "number" && resData.qty > 0) return true;
-    if (typeof resData.quantity === "number" && resData.quantity > 0)
-      return true;
-
-    // sometimes nested
+    if (typeof resData.quantity === "number" && resData.quantity > 0) return true;
     if (
       resData.data &&
       (resData.data.available === true ||
         (typeof resData.data.qty === "number" && resData.data.qty > 0))
     )
       return true;
-
-    // if response contains variants array
-    if (Array.isArray(resData.variants)) {
-      const any = resData.variants.some(
-        (v) => v.sku === code || v.model === code
-      );
-      if (any) return true; // conservative — we'll refine when we have examples
-    }
   }
 
-  // fallback: look for any truthy string 'available' in the JSON
+  // fallback
   try {
     const text = JSON.stringify(resData).toLowerCase();
     if (
@@ -342,23 +466,91 @@ const checkAppleStock = async () => {
   }
 };
 
+// Separate function to check platforms without pincode (iQOO, Vivo)
+const checkPlatformsWithoutPincode = async () => {
+  const platformsWithoutPincode = ["iQOO", "Vivo"]; // Removed "Amazon" - disabled
+  
+  for (const platform of PLATFORMS) {
+    if (!platformsWithoutPincode.includes(platform.name)) continue;
+    if (!platform.products || platform.products.length === 0) continue;
+
+    for (const product of platform.products) {
+      const productId = typeof product === "object" ? product.id : product;
+      const productName = typeof product === "object" ? product.name : product;
+      const productUrl = typeof product === "object" ? product.url : null;
+
+      try {
+        let data;
+        
+        // Remove Amazon check - only iQOO and Vivo
+        // iQOO and Vivo
+        if (typeof platform.customRequest === "function") {
+          data = await platform.customRequest({ code: productId, axios });
+        } else {
+          data = await callStockAPI(platform, null, productId);
+        }
+
+        const available = detectAvailability(
+          platform.name,
+          productId,
+          null,
+          data
+        );
+
+        if (available) {
+          const productLink = getProductLink(platform.name, productId, productUrl);
+          let text = `✅ *Stock Alert*\nPlatform: ${platform.name}\nProduct: [${productName}](${productLink})\n`;
+
+          console.log("ALERT ->", platform.name, productId);
+          await sendTelegram(text);
+          await sleep(500);
+        } else {
+          console.log("No stock:", platform.name, productId);
+        }
+
+        await sleep(1000); // Delay between products
+      } catch (err) {
+        console.error("Error checking", platform.name, productId, err.message);
+        await sleep(1000);
+      }
+    }
+  }
+};
+
 const checkStock = async () => {
   console.log("Starting stock sweep at", new Date().toISOString());
 
-  // Check Apple separately (no pincode iteration)
+  // Check Apple separately (no pincode iteration) - DISABLED
   // await checkAppleStock();
+
+  // Check platforms without pincode (iQOO, Vivo) - Amazon disabled
+  await checkPlatformsWithoutPincode();
 
   // Check other platforms with pincode iteration
   for (const platform of PLATFORMS) {
-    // Skip Apple as it's handled separately
-    if (platform.name === "Apple") continue;
+    // Skip Apple, Amazon as they're disabled, and iQOO, Vivo as they're handled separately
+    if (["Apple", "Amazon", "iQOO", "Vivo"].includes(platform.name)) continue;
+    
+    // Also skip if platform has no products
+    if (!platform.products || platform.products.length === 0) continue;
+
+    // Get platform-specific pincodes, fallback to global PINCODES if not specified
+    const platformPincodes = platform.pincodes && platform.pincodes.length > 0 
+      ? platform.pincodes 
+      : PINCODES; // Fallback to global PINCODES
+
+    // Skip if no pincodes configured
+    if (!platformPincodes || platformPincodes.length === 0) {
+      console.log(`Skipping ${platform.name} - no pincodes configured`);
+      continue;
+    }
 
     for (const product of platform.products) {
-      // Handle both object format {id, name} and string format (backward compatibility)
       const productId = typeof product === "object" ? product.id : product;
       const productName = typeof product === "object" ? product.name : product;
+      const productUrl = typeof product === "object" ? product.url : null;
 
-      for (const pincode of PINCODES) {
+      for (const pincode of platformPincodes) {
         try {
           const data = await callStockAPI(platform, pincode, productId);
           const available = detectAvailability(
@@ -369,9 +561,8 @@ const checkStock = async () => {
           );
 
           if (available) {
-            // Format message based on platform
-            const productLink = getProductLink(platform.name, productId);
-            let text = "";
+            const productLink = getProductLink(platform.name, productId, productUrl);
+            let text = `✅ *Stock Alert*\nPlatform: ${platform.name}\nProduct: [${productName}](${productLink})\n📍 Pincode: ${pincode}`;
 
             // For Samsung, extract availability details
             if (platform.name === "Samsung") {
@@ -485,7 +676,22 @@ const checkStock = async () => {
               } else {
                 text += `\n\n⚠️ Stock detected but no fulfillment details available`;
               }
-            } else {
+            }
+            // For Flipkart
+            else if (platform.name === "Flipkart") {
+              const details = getFlipkartAvailabilityDetails(productId, data);
+              if (details?.price) {
+                text += `\n💰 Price: ₹${details.price}`;
+              }
+            }
+            // For Reliance Digital
+            else if (platform.name === "Reliance Digital") {
+              const details = getRelianceDigitalAvailabilityDetails(productId, data);
+              if (details?.errorMessage) {
+                text += `\n⚠️ Note: ${details.errorMessage}`;
+              }
+            }
+            else {
               text += `\nResponse: ${JSON.stringify(data)}`;
             }
 
@@ -510,14 +716,14 @@ const checkStock = async () => {
   }
 };
 
-// Cron: Apple every 1 minute
+// Cron: Apple every 1 minute - DISABLED (not working)
 // cron.schedule("* * * * *", () => {
 //   checkAppleStock().catch((e) =>
 //     console.error("checkAppleStock failed:", e.message)
 //   );
 // });
 
-// Cron: Other platforms every 5 minutes
+// Cron: Other platforms every 2 minutes (Apple and Amazon disabled)
 cron.schedule("*/2  * * * *", () => {
   checkStock().catch((e) => console.error("checkStock failed:", e.message));
 });
@@ -556,3 +762,5 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log("Tracking bot is active!");
 });
+
+

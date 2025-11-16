@@ -77,8 +77,11 @@ export const callStockAPI = async (platform, pincode, code) => {
   }
 };
 
-// Custom request function for Croma
+// Custom request function for Croma - SIMPLIFIED (based on working Python code)
 const cromaCustomRequest = async ({ pincode, code, axios }) => {
+  // Ensure pincode is a string (Python passes it as string)
+  const pincodeStr = String(pincode);
+
   const requestBody = {
     promise: {
       allocationRuleID: "SYSTEM",
@@ -89,74 +92,11 @@ const cromaCustomRequest = async ({ pincode, code, axios }) => {
         promiseLine: [
           {
             fulfillmentType: "HDEL",
-            mch: "",
-            itemID: code,
+            itemID: String(code), // Ensure code is string
             lineId: "1",
-            categoryType: "mobile",
-            reEndDate: "2500-01-01",
-            reqStartDate: "",
             requiredQty: "1",
             shipToAddress: {
-              company: "",
-              country: "",
-              city: "",
-              mobilePhone: "",
-              state: "",
-              zipCode: pincode,
-              extn: {
-                irlAddressLine1: "",
-                irlAddressLine2: "",
-              },
-            },
-            extn: {
-              widerStoreFlag: "N",
-            },
-          },
-          {
-            fulfillmentType: "STOR",
-            mch: "",
-            itemID: code,
-            lineId: "2",
-            categoryType: "mobile",
-            reqEndDate: "",
-            reqStartDate: "",
-            requiredQty: "1",
-            shipToAddress: {
-              company: "",
-              country: "",
-              city: "",
-              mobilePhone: "",
-              state: "",
-              zipCode: pincode,
-              extn: {
-                irlAddressLine1: "",
-                irlAddressLine2: "",
-              },
-            },
-            extn: {
-              widerStoreFlag: "N",
-            },
-          },
-          {
-            fulfillmentType: "SDEL",
-            mch: "",
-            itemID: code,
-            lineId: "3",
-            categoryType: "mobile",
-            reqEndDate: "",
-            reqStartDate: "",
-            requiredQty: "1",
-            shipToAddress: {
-              company: "",
-              country: "",
-              city: "",
-              mobilePhone: "",
-              state: "",
-              zipCode: pincode,
-              extn: {
-                irlAddressLine1: "",
-                irlAddressLine2: "",
-              },
+              zipCode: pincodeStr,
             },
             extn: {
               widerStoreFlag: "N",
@@ -173,38 +113,33 @@ const cromaCustomRequest = async ({ pincode, code, axios }) => {
       requestBody,
       {
         headers: {
-          accept: "application/json, text/plain, */*",
-          "accept-language": "en-US,en;q=0.9",
-          accesstoken: "2fe360a8-442f-4881-9b30-451c1643c339",
-          client_id: "CROMA-WEB-APP",
+          accept: "application/json",
           "content-type": "application/json",
-          csc_code: "null",
-          customerhash: "3256e9210dc30c675fefe93551b083e3",
           "oms-apim-subscription-key": "1131858141634e2abe2efb2b3a2a2a5d",
           origin: "https://www.croma.com",
-          priority: "u=1, i",
           referer: "https://www.croma.com/",
-          "sec-ch-ua":
-            '"Chromium";v="142", "Brave";v="142", "Not_A Brand";v="99"',
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"Windows"',
-          "sec-fetch-dest": "empty",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "same-site",
-          "sec-gpc": "1",
-          source: "null",
-          "user-agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
         },
         timeout: 10_000,
       }
     );
     return res.data;
   } catch (err) {
-    console.error("Croma API error:", err.message);
+    // Enhanced error logging to see actual API response
+    console.error(
+      `Croma API error for product ${code}, pincode ${pincode}:`,
+      err.message
+    );
     if (err.response) {
       console.error("Response status:", err.response.status);
-      console.error("Response data:", err.response.data);
+      console.error("Response headers:", err.response.headers);
+      if (err.response.data) {
+        console.error(
+          "Response data:",
+          JSON.stringify(err.response.data, null, 2)
+        );
+      }
+    } else if (err.request) {
+      console.error("Request made but no response received:", err.request);
     }
     return null;
   }
@@ -334,13 +269,229 @@ const applePickupCheck = async (productId, axios, retryCount = 0) => {
   }
 };
 
+// Custom request function for Flipkart (via proxy)
+const flipkartCustomRequest = async ({ pincode, code, axios }) => {
+  try {
+    const proxyUrl =
+      process.env.FLIPKART_PROXY_URL ||
+      "https://rknldeals.alwaysdata.net/flipkart_check";
+    const res = await axios.post(
+      proxyUrl,
+      {
+        productId: code,
+        pincode: pincode,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        timeout: 25_000,
+      }
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Flipkart API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request function for Reliance Digital
+const relianceDigitalCustomRequest = async ({ pincode, code, axios }) => {
+  try {
+    const url =
+      "https://www.reliancedigital.in/ext/raven-api/inventory/multi/articles-v2";
+    const payload = {
+      articles: [
+        {
+          article_id: String(code),
+          custom_json: {},
+          quantity: 1,
+        },
+      ],
+      phone_number: "0",
+      pincode: String(pincode),
+      request_page: "pdp",
+    };
+
+    const res = await axios.post(url, payload, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "content-type": "application/json",
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+        origin: "https://www.reliancedigital.in",
+        referer: "https://www.reliancedigital.in/",
+      },
+      timeout: 20_000,
+    });
+    return res.data;
+  } catch (err) {
+    console.error("Reliance Digital API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request function for iQOO (no pincode)
+const iqooCustomRequest = async ({ code, axios }) => {
+  try {
+    const url = `https://mshop.iqoo.com/in/api/product/activityInfo/all/${code}`;
+    const res = await axios.get(url, {
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        Referer: `https://mshop.iqoo.com/in/product/${code}`,
+        "User-Agent":
+          "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/5.36",
+      },
+      timeout: 10_000,
+    });
+    return res.data;
+  } catch (err) {
+    console.error("iQOO API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request function for Vivo (no pincode)
+const vivoCustomRequest = async ({ code, axios }) => {
+  try {
+    const url = `https://mshop.vivo.com/in/api/product/activityInfo/all/${code}`;
+    const res = await axios.get(url, {
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        Referer: `https://mshop.vivo.com/in/product/${code}`,
+        "User-Agent":
+          "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/5.36",
+      },
+      timeout: 10_000,
+    });
+    return res.data;
+  } catch (err) {
+    console.error("Vivo API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request function for Amazon PAAPI v5 (no pincode)
+const amazonCustomRequest = async ({ code, axios }) => {
+  const crypto = await import("crypto");
+  const hmac = crypto.createHmac;
+
+  const AMAZON_ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID;
+  const AMAZON_SECRET_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+  const AMAZON_PARTNER_TAG = process.env.AMAZON_PARTNER_TAG;
+  const AMAZON_HOST = "webservices.amazon.in";
+  const AMAZON_REGION = "eu-west-1";
+  const AMAZON_SERVICE = "ProductAdvertisingAPI";
+
+  if (!AMAZON_ACCESS_KEY || !AMAZON_SECRET_KEY || !AMAZON_PARTNER_TAG) {
+    console.error("Amazon API credentials not configured");
+    return null;
+  }
+
+  try {
+    const now = new Date();
+    const amzDate = now.toISOString().replace(/[:\-]|\.\d{3}/g, "");
+    const dateStamp = amzDate.substr(0, 8);
+
+    const payload = {
+      ItemIds: [code],
+      PartnerTag: AMAZON_PARTNER_TAG,
+      PartnerType: "Associates",
+      Marketplace: "www.amazon.in",
+      Resources: ["OffersV2.Listings.Availability", "ItemInfo.Title"],
+    };
+
+    const payloadStr = JSON.stringify(payload);
+    const method = "POST";
+    const target = "com.amazon.paapi5.v1.ProductAdvertisingAPIv1.GetItems";
+    const contentType = "application/json; charset=UTF-8";
+
+    // Create canonical request
+    const canonicalHeaders = `content-type:${contentType}\nhost:${AMAZON_HOST}\nx-amz-date:${amzDate}\nx-amz-target:${target}\n`;
+    const signedHeaders = "content-type;host;x-amz-date;x-amz-target";
+    const payloadHash = crypto
+      .createHash("sha256")
+      .update(payloadStr)
+      .digest("hex");
+
+    const canonicalRequest = `${method}\n/paapi5/getitems\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+
+    // Create string to sign
+    const algorithm = "AWS4-HMAC-SHA256";
+    const credentialScope = `${dateStamp}/${AMAZON_REGION}/${AMAZON_SERVICE}/aws4_request`;
+    const canonicalRequestHash = crypto
+      .createHash("sha256")
+      .update(canonicalRequest)
+      .digest("hex");
+    const stringToSign = `${algorithm}\n${amzDate}\n${credentialScope}\n${canonicalRequestHash}`;
+
+    // Calculate signature
+    const kDate = hmac(
+      "sha256",
+      `AWS4${AMAZON_SECRET_KEY}`,
+      dateStamp
+    ).digest();
+    const kRegion = hmac("sha256", kDate, AMAZON_REGION).digest();
+    const kService = hmac("sha256", kRegion, AMAZON_SERVICE).digest();
+    const kSigning = hmac("sha256", kService, "aws4_request").digest();
+    const signature = hmac("sha256", kSigning, stringToSign).digest("hex");
+
+    const authorizationHeader = `${algorithm} Credential=${AMAZON_ACCESS_KEY}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+    const res = await axios.post(
+      `https://${AMAZON_HOST}/paapi5/getitems`,
+      payloadStr,
+      {
+        headers: {
+          "Content-Type": contentType,
+          "X-Amz-Date": amzDate,
+          "X-Amz-Target": target,
+          Authorization: authorizationHeader,
+          "Content-Encoding": "amz-1.0",
+          Host: AMAZON_HOST,
+        },
+        timeout: 10_000,
+      }
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Amazon API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Initialize custom requests
+attachCustomRequest("Croma", cromaCustomRequest);
+attachCustomRequest("Samsung", samsungCustomRequest);
+attachCustomRequest("Flipkart", flipkartCustomRequest);
+attachCustomRequest("Reliance Digital", relianceDigitalCustomRequest);
+attachCustomRequest("iQOO", iqooCustomRequest);
+attachCustomRequest("Vivo", vivoCustomRequest);
+// attachCustomRequest("Amazon", amazonCustomRequest);
+
 // Export for use in index.js
 export { applePickupCheck };
-
-// Initialize Croma custom request
-attachCustomRequest("Croma", cromaCustomRequest);
-
-// Initialize Samsung custom request
-attachCustomRequest("Samsung", samsungCustomRequest);
 
 // Note: Apple uses separate applePickupCheck function, not attached here

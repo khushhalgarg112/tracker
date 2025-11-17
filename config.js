@@ -1,6 +1,5 @@
 export const PINCODES = ["122001"];
 
-
 export const PLATFORMS = [
   {
     name: "Croma",
@@ -9,63 +8,63 @@ export const PLATFORMS = [
     apiKey: null,
     pincodes: ["122001"], // Only check this one pincode for Croma
     products: [
-      // { 
-      //   id: "317398", 
+      // {
+      //   id: "317398",
       //   name: "Apple iPhone 17 256GB White",
       //   url: "https://www.croma.com/apple-iphone-17-256gb-white-/p/317398"
       // },
-      // { 
-      //   id: "317400", 
+      // {
+      //   id: "317400",
       //   name: "Apple iPhone 17 256GB Mist Blue",
       //   url: "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400"
       // },
-      // { 
-      //   id: "317396", 
+      // {
+      //   id: "317396",
       //   name: "Apple iPhone 17 256GB Black",
       //   url: "https://www.croma.com/apple-iphone-17-256gb-black-/p/317396"
       // },
-      // { 
-      //   id: "317403", 
+      // {
+      //   id: "317403",
       //   name: "Apple iPhone 17 256GB Sage",
       //   url: "https://www.croma.com/apple-iphone-17-256gb-sage-/p/317403"
       // },
-      // { 
-      //   id: "317401", 
+      // {
+      //   id: "317401",
       //   name: "Apple iPhone 17 256GB Lavender",
       //   url: "https://www.croma.com/apple-iphone-17-256gb-lavender-/p/317401"
       // },
-      // { 
-      //   id: "316303", 
+      // {
+      //   id: "316303",
       //   name: "Oppo K13X 5G 4GB RAM 128GB Sunset Peach",
       //   url: "https://www.croma.com/oppo-k13x-5g-4gb-ram-128gb-sunset-peach-/p/316303"
       // },
-      // { 
-      //   id: "312574", 
+      // {
+      //   id: "312574",
       //   name: "Vivo Y29 5G 4GB RAM 128GB Glacier Blue",
       //   url: "https://www.croma.com/vivo-y29-5g-4gb-ram-128gb-glacier-blue-/p/312574"
       // },
-      // { 
-      //   id: "312575", 
+      // {
+      //   id: "312575",
       //   name: "Vivo Y29 5G 4GB RAM 128GB Diamond Black",
       //   url: "https://www.croma.com/vivo-y29-5g-4gb-ram-128gb-diamond-black-/p/312575"
       // },
-      // { 
-      //   id: "312577", 
+      // {
+      //   id: "312577",
       //   name: "Vivo Y29 5G 4GB RAM 128GB Titanium Gold",
       //   url: "https://www.croma.com/vivo-y29-5g-4gb-ram-128gb-titanium-gold-/p/312577"
       // },
-      // { 
-      //   id: "314881", 
+      // {
+      //   id: "314881",
       //   name: "Google Pixel 9a 5G (8GB RAM, 256GB, Obsidian)",
       //   url: "https://www.croma.com/pixel-9a-/p/314881"
       // },
-      // { 
-      //   id: "314882", 
+      // {
+      //   id: "314882",
       //   name: "Google Pixel 9a 5G (8GB RAM, 256GB, Porcelain)",
       //   url: "https://www.croma.com/google-pixel-9a-5g-8gb-ram-256gb-porcelain-/p/314882"
       // },
-      // { 
-      //   id: "314883", 
+      // {
+      //   id: "314883",
       //   name: "Google Pixel 9a 5G (8GB RAM, 256GB, Iris)",
       //   url: "https://www.croma.com/google-pixel-9a-5g-8gb-ram-256gb-iris-/p/314883"
       // },
@@ -100,7 +99,7 @@ export const PLATFORMS = [
     apiUrl: "https://www.samsung.com/in/api/v4/configurator/serviceability",
     method: "GET",
     apiKey: null,
-    pincodes: ["122001", "110016"], 
+    pincodes: ["122001", "110016"],
     products: [],
   },
   {
@@ -132,16 +131,37 @@ export const PLATFORMS = [
   },
   {
     name: "Reliance Digital",
-    apiUrl: "https://www.reliancedigital.in/ext/raven-api/inventory/multi/articles-v2",
+    apiUrl:
+      "https://www.reliancedigital.in/ext/raven-api/inventory/multi/articles-v2",
     method: "POST",
     apiKey: null,
     pincodes: ["122001", "485001"], // Multiple pincodes for Reliance Digital
     products: [
-      { id: "494741625", name: "Apple iPhone 17 256 GB, White", url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-white-mff8s2-9391633?internal_source=search_collection" },
-      { id: "494741626", name: "Apple iPhone 17 256 GB, Mist Blue", url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-mist-blue-mff8s5-9391645?internal_source=search_collection" },
-      { id: "494741624", name: "Apple iPhone 17 256 GB, Black", url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-black-mff8ru-9391619?internal_source=search_collection" },
-      { id: "494741627", name: "Apple iPhone 17 256 GB, Lavender", url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-lavender-mff8ry-9391624?internal_source=search_collection" },
-      { id: "494741628", name: "Apple iPhone 17 256 GB, Sage", url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-sage-mff8s3-9391641?internal_source=search_collection" },
+      {
+        id: "494741625",
+        name: "Apple iPhone 17 256 GB, White",
+        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-white-mff8s2-9391633?internal_source=search_collection",
+      },
+      {
+        id: "494741626",
+        name: "Apple iPhone 17 256 GB, Mist Blue",
+        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-mist-blue-mff8s5-9391645?internal_source=search_collection",
+      },
+      {
+        id: "494741624",
+        name: "Apple iPhone 17 256 GB, Black",
+        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-black-mff8ru-9391619?internal_source=search_collection",
+      },
+      {
+        id: "494741627",
+        name: "Apple iPhone 17 256 GB, Lavender",
+        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-lavender-mff8ry-9391624?internal_source=search_collection",
+      },
+      {
+        id: "494741628",
+        name: "Apple iPhone 17 256 GB, Sage",
+        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-sage-mff8s3-9391641?internal_source=search_collection",
+      },
     ],
   },
   {
@@ -149,12 +169,12 @@ export const PLATFORMS = [
     apiUrl: "https://mshop.iqoo.com/in/api/product/activityInfo/all/",
     method: "GET",
     apiKey: null,
-    pincodes: [], // No pincode needed for iQOO
+    pincodes: ["122001", "485001"],
     products: [
-      { 
-        id: "2057", 
-        name: "Neo 10R 8GB+128GB MoonKnight Titanium", 
-        url: "https://shop.iqoo.com/in/product/2057?cid=noPreload&_gl=1%2ah7x205%2a_ga%2aMTUwMjg5MDA5MC4xNzYzMjgzNDUw%2a_ga_JX6ZMMBG2R%2aczE3NjMyODM0NDkkbzEkZzEkdDE3NjMyODM1MTgkajUyJGwwJGgw" 
+      {
+        id: "2057",
+        name: "Neo 10R 8GB+128GB MoonKnight Titanium",
+        url: "https://shop.iqoo.com/in/product/2057?cid=noPreload&_gl=1%2ah7x205%2a_ga%2aMTUwMjg5MDA5MC4xNzYzMjgzNDUw%2a_ga_JX6ZMMBG2R%2aczE3NjMyODM0NDkkbzEkZzEkdDE3NjMyODM1MTgkajUyJGwwJGgw",
       },
     ],
   },
@@ -165,8 +185,8 @@ export const PLATFORMS = [
     apiKey: null,
     pincodes: [], // No pincode needed for Vivo
     products: [
-        //  { id: "10297", name: "X200 12GB+256GB Natural Green", url: "https://shop.vivo.com/in/product/10297?utm_source=website&utm_medium=mainbanner&utm_campaign=x200launch&cid=noPreload&_ga=2.163479356.1656843844.1763283692-1348449134.1763283692&_gl=1%2aloo18t%2a_ga%2aMTM0ODQ0OTEzNC4xNzYzMjgzNjky%2a_ga_68BLCXM546%2aczE3NjMyODM2OTIkbzEkZzEkdDE3NjMyODM2OTYkajU2JGwwJGgw" },
-        //  { id: "10320", name: "V60 8GB+128GB Mist Gray", url: "https://shop.vivo.com/in/product/10320?utm_source=website%20&utm_medium=mainbanner&utm_campaign=vivo_v60"}
+      //  { id: "10297", name: "X200 12GB+256GB Natural Green", url: "https://shop.vivo.com/in/product/10297?utm_source=website&utm_medium=mainbanner&utm_campaign=x200launch&cid=noPreload&_ga=2.163479356.1656843844.1763283692-1348449134.1763283692&_gl=1%2aloo18t%2a_ga%2aMTM0ODQ0OTEzNC4xNzYzMjgzNjky%2a_ga_68BLCXM546%2aczE3NjMyODM2OTIkbzEkZzEkdDE3NjMyODM2OTYkajU2JGwwJGgw" },
+      //  { id: "10320", name: "V60 8GB+128GB Mist Gray", url: "https://shop.vivo.com/in/product/10320?utm_source=website%20&utm_medium=mainbanner&utm_campaign=vivo_v60"}
     ],
   },
   {

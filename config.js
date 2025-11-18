@@ -58,16 +58,6 @@ export const PLATFORMS = [
       //   name: "Google Pixel 9a 5G (8GB RAM, 256GB, Obsidian)",
       //   url: "https://www.croma.com/pixel-9a-/p/314881"
       // },
-      // {
-      //   id: "314882",
-      //   name: "Google Pixel 9a 5G (8GB RAM, 256GB, Porcelain)",
-      //   url: "https://www.croma.com/google-pixel-9a-5g-8gb-ram-256gb-porcelain-/p/314882"
-      // },
-      // {
-      //   id: "314883",
-      //   name: "Google Pixel 9a 5G (8GB RAM, 256GB, Iris)",
-      //   url: "https://www.croma.com/google-pixel-9a-5g-8gb-ram-256gb-iris-/p/314883"
-      // },
     ],
     // Croma-specific headers
     headers: {
@@ -99,8 +89,45 @@ export const PLATFORMS = [
     apiUrl: "https://www.samsung.com/in/api/v4/configurator/serviceability",
     method: "GET",
     apiKey: null,
-    pincodes: ["122001", "110016"],
-    products: [],
+    pincodes: ["122001", "110016", "110008", "125104"],
+    products: [
+      // {
+      //   id : "SM-X516BLGEINU",
+      //   name : "tab s9fe 8/128 5g Mint",
+      //   url : "https://www.samsung.com/in/tablets/galaxy-tab-s9-fe/buy/"
+      // },
+      // {
+      //   id : "SM-X516BLIEINU",
+      //   name : "tab s9fe 8/128 5g lavender",
+      //   url : "https://www.samsung.com/in/tablets/galaxy-tab-s9-fe/buy/"
+      // },
+      // {
+      //   id : "SM-X516BZAEINU",
+      //   name : "tab s9fe 8/128 5g grey",
+      //   url : "https://www.samsung.com/in/tablets/galaxy-tab-s9-fe/buy/"
+      // },
+      // {
+      //   id : "SM-X516BZSEINU",
+      //   name : "tab s9fe 8/128 5g silver",
+      //   url : "https://www.samsung.com/in/tablets/galaxy-tab-s9-fe/buy/"
+      // },
+      // {
+      //   id : "SM-X216BDBEINS",
+      //   name : "tab A9+ 8/128 5g dark blue",
+      //   url : "https://www.samsung.com/in/tablets/galaxy-tab-a9/buy/"
+      // },
+      // {
+      //   id : "SM-X216BZAEINS",
+      //   name : "tab A9+ 8/128 5g Grey",
+      //   url : "https://www.samsung.com/in/tablets/galaxy-tab-a9/buy/"
+      // }
+      // ,
+      // {
+      //   id : "SM-X216BZSEINS",
+      //   name : "tab A9+ 8/128 5g Silver",
+      //   url : "https://www.samsung.com/in/tablets/galaxy-tab-a9/buy/"
+      // }
+    ],
   },
   {
     name: "Apple",
@@ -135,7 +162,7 @@ export const PLATFORMS = [
       "https://www.reliancedigital.in/ext/raven-api/inventory/multi/articles-v2",
     method: "POST",
     apiKey: null,
-    pincodes: ["122001", "485001"], // Multiple pincodes for Reliance Digital
+    pincodes: ["122001", "485001",  "110008", "125104"], // Multiple pincodes for Reliance Digital
     products: [
       {
         id: "494741625",
@@ -169,13 +196,18 @@ export const PLATFORMS = [
     apiUrl: "https://mshop.iqoo.com/in/api/product/activityInfo/all/",
     method: "GET",
     apiKey: null,
-    pincodes: ["122001", "485001"],
+    pincodes: ["122001", "485001",  "110008", "125104"],
     products: [
       {
         id: "2057",
-        name: "Neo 10R 8GB+128GB MoonKnight Titanium",
+        name: "Iqoo Neo 10R ",
         url: "https://shop.iqoo.com/in/product/2057?cid=noPreload&_gl=1%2ah7x205%2a_ga%2aMTUwMjg5MDA5MC4xNzYzMjgzNDUw%2a_ga_JX6ZMMBG2R%2aczE3NjMyODM0NDkkbzEkZzEkdDE3NjMyODM1MTgkajUyJGwwJGgw",
       },
+      {
+        id : "2063",
+        name : "Iqoo Neo 10",
+        url: "https://shop.iqoo.com/in/product/2063?skuId=8375"
+      }
     ],
   },
   {

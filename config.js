@@ -89,7 +89,7 @@ export const PLATFORMS = [
     apiUrl: "https://www.samsung.com/in/api/v4/configurator/serviceability",
     method: "GET",
     apiKey: null,
-    pincodes: ["122001", "110016", "110008", "125104"],
+    pincodes: ["122001", "110016"],
     products: [
       // {
       //   id : "SM-X516BLGEINU",
@@ -162,7 +162,7 @@ export const PLATFORMS = [
       "https://www.reliancedigital.in/ext/raven-api/inventory/multi/articles-v2",
     method: "POST",
     apiKey: null,
-    pincodes: ["122001", "485001",  "110008", "125104"], // Multiple pincodes for Reliance Digital
+    pincodes: ["122001", "485001"], // Multiple pincodes for Reliance Digital
     products: [
       {
         id: "494741625",
@@ -196,7 +196,7 @@ export const PLATFORMS = [
     apiUrl: "https://mshop.iqoo.com/in/api/product/activityInfo/all/",
     method: "GET",
     apiKey: null,
-    pincodes: ["122001", "485001",  "110008", "125104"],
+    pincodes: ["122001", "485001"],
     products: [
       {
         id: "2057",
@@ -204,10 +204,10 @@ export const PLATFORMS = [
         url: "https://shop.iqoo.com/in/product/2057?cid=noPreload&_gl=1%2ah7x205%2a_ga%2aMTUwMjg5MDA5MC4xNzYzMjgzNDUw%2a_ga_JX6ZMMBG2R%2aczE3NjMyODM0NDkkbzEkZzEkdDE3NjMyODM1MTgkajUyJGwwJGgw",
       },
       {
-        id : "2063",
-        name : "Iqoo Neo 10",
-        url: "https://shop.iqoo.com/in/product/2063?skuId=8375"
-      }
+        id: "2063",
+        name: "Iqoo Neo 10",
+        url: "https://shop.iqoo.com/in/product/2063?skuId=8375",
+      },
     ],
   },
   {

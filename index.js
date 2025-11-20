@@ -535,6 +535,25 @@ const checkPlatformsWithoutPincode = async () => {
 const checkStock = async () => {
   console.log("Starting stock sweep at", new Date().toISOString());
 
+  // Check if Croma has no products configured, then call external API
+  const cromaPlatform = PLATFORMS.find((p) => p.name === "Croma");
+  if (cromaPlatform && cromaPlatform.products.length === 0) {
+    console.log("\n🔍 Croma products length is 0 - calling external API...");
+    try {
+      const response = await axios.post(
+        "https://inventory-rho-ten.vercel.app/api/cron"
+      );
+      console.log("✅ External Croma API called successfully (POST)");
+      console.log("   Response:", response.data);
+    } catch (err) {
+      console.error("❌ Error calling external Croma API:", err.message);
+      if (err.response) {
+        console.error("   Status:", err.response.status);
+        console.error("   Data:", err.response.data);
+      }
+    }
+  }
+
   // Check Apple separately (no pincode iteration) - DISABLED
   // await checkAppleStock();
 

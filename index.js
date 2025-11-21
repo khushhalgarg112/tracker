@@ -305,6 +305,71 @@ const getAmazonAvailabilityDetails = (resData) => {
   }
 };
 
+// Helper function to get Unicorn availability details
+const getUnicornAvailabilityDetails = (resData) => {
+  try {
+    const product = resData?.data?.product;
+    if (!product) return null;
+
+    const quantity = Number(product.quantity) || 0;
+    const price = Number(product.price);
+
+    return {
+      available: quantity > 0,
+      quantity,
+      price: Number.isFinite(price) ? price : null,
+      sku: product.sku,
+      dispatchNote: product.custom_column_4 || null,
+    };
+  } catch (err) {
+    console.error("Error parsing Unicorn availability:", err.message);
+    return null;
+  }
+};
+
+// Helper function to get Vijay Sales availability details
+const getVijaySalesAvailabilityDetails = (code, resData) => {
+  try {
+    const productData = resData?.data?.[String(code)];
+    if (!productData) return null;
+
+    const pickupList = Array.isArray(productData.storePickupList)
+      ? productData.storePickupList
+      : [];
+
+    const delivery = productData.isServiceable === true;
+    const pickup = pickupList.length > 0;
+
+    return {
+      available: delivery || pickup,
+      delivery,
+      pickup,
+      pickupList,
+    };
+  } catch (err) {
+    console.error("Error parsing Vijay Sales availability:", err.message);
+    return null;
+  }
+};
+
+// Helper function to get Sangeetha availability details
+const getSangeethaAvailabilityDetails = (resData) => {
+  try {
+    const eta = resData?.data?.product_eta;
+    if (!eta) return null;
+
+    const inStock = (eta.stock_status || "").toLowerCase() === "instock";
+    return {
+      available: inStock,
+      etaTitle: eta.eta_title || null,
+      etaMessage: eta.eta_message || null,
+    };
+  } catch (err) {
+    console.error("Error parsing Sangeetha availability:", err.message);
+    return null;
+  }
+};
+
 const detectAvailability = (platformName, code, pincode, resData) => {
   if (!resData) return false;
 
@@ -364,6 +429,21 @@ const detectAvailability = (platformName, code, pincode, resData) => {
   // Amazon-specific detection
   if (platformName === "Amazon") {
     const availabilityDetails = getAmazonAvailabilityDetails(resData);
+    return availabilityDetails?.available === true;
+  }
+
+  if (platformName === "Unicorn") {
+    const availabilityDetails = getUnicornAvailabilityDetails(resData);
+    return availabilityDetails?.available === true;
+  }
+
+  if (platformName === "Vijay Sales") {
+    const availabilityDetails = getVijaySalesAvailabilityDetails(code, resData);
+    return availabilityDetails?.available === true;
+  }
+
+  if (platformName === "Sangeetha") {
+    const availabilityDetails = getSangeethaAvailabilityDetails(resData);
     return availabilityDetails?.available === true;
   }
 
@@ -477,9 +557,9 @@ const checkAppleStock = async () => {
   }
 };
 
-// Separate function to check platforms without pincode (iQOO, Vivo)
+// Separate function to check platforms without pincode (iQOO, Vivo, Unicorn)
 const checkPlatformsWithoutPincode = async () => {
-  const platformsWithoutPincode = ["iQOO", "Vivo"]; // Removed "Amazon" - disabled
+  const platformsWithoutPincode = ["iQOO", "Vivo", "Unicorn"]; // Removed "Amazon" - disabled
 
   for (const platform of PLATFORMS) {
     if (!platformsWithoutPincode.includes(platform.name)) continue;
@@ -515,6 +595,19 @@ const checkPlatformsWithoutPincode = async () => {
             productUrl
           );
           let text = `✅ *Stock Alert*\nPlatform: ${platform.name}\nProduct: [${productName}](${productLink})\n`;
+
+          if (platform.name === "Unicorn") {
+            const details = getUnicornAvailabilityDetails(data);
+            if (details) {
+              if (details.price) {
+                text += `💰 Price: ₹${details.price.toLocaleString("en-IN")}\n`;
+              }
+              text += `📦 Quantity: ${details.quantity ?? "N/A"}\n`;
+              if (details.sku) {
+                text += `SKU: ${details.sku}\n`;
+              }
+            }
+          }
 
           console.log("ALERT ->", platform.name, productId);
           await sendTelegram(text);
@@ -557,13 +650,14 @@ const checkStock = async () => {
   // Check Apple separately (no pincode iteration) - DISABLED
   // await checkAppleStock();
 
-  // Check platforms without pincode (iQOO, Vivo) - Amazon disabled
+  // Check platforms without pincode (iQOO, Vivo, Unicorn) - Amazon disabled
   await checkPlatformsWithoutPincode();
 
   // Check other platforms with pincode iteration
   for (const platform of PLATFORMS) {
     // Skip Apple, Amazon as they're disabled, and iQOO, Vivo as they're handled separately
-    if (["Apple", "Amazon", "iQOO", "Vivo"].includes(platform.name)) continue;
+    if (["Apple", "Amazon", "iQOO", "Vivo", "Unicorn"].includes(platform.name))
+      continue;
 
     // Also skip if platform has no products
     if (!platform.products || platform.products.length === 0) continue;
@@ -731,6 +825,32 @@ const checkStock = async () => {
               );
               if (details?.errorMessage) {
                 text += `\n⚠️ Note: ${details.errorMessage}`;
+              }
+            }
+            // For Vijay Sales
+            else if (platform.name === "Vijay Sales") {
+              const details = getVijaySalesAvailabilityDetails(productId, data);
+              if (details) {
+                text += `\n📦 Delivery: ${details.delivery ? "YES" : "NO"}`;
+                text += `\n🏬 Pickup: ${details.pickup ? "YES" : "NO"}`;
+                if (details.pickupList?.length) {
+                  const store = details.pickupList[0];
+                  text += `\nStore: ${
+                    store.storeName || store.store_name || "N/A"
+                  }`;
+                }
+              }
+            }
+            // For Sangeetha
+            else if (platform.name === "Sangeetha") {
+              const details = getSangeethaAvailabilityDetails(data);
+              if (details) {
+                if (details.etaTitle) {
+                  text += `\nETA: ${details.etaTitle}`;
+                }
+                if (details.etaMessage) {
+                  text += `\n${details.etaMessage}`;
+                }
               }
             } else {
               text += `\nResponse: ${JSON.stringify(data)}`;

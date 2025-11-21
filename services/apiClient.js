@@ -440,6 +440,118 @@ const vivoCustomRequest = async ({ code, axios }) => {
   }
 };
 
+// Custom request function for Unicorn (no pincode)
+const unicornCustomRequest = async ({ code, axios }) => {
+  try {
+    const unicornPlatform = PLATFORMS.find((p) => p.name === "Unicorn") || {};
+    const storageOptionId = unicornPlatform.storageOptionId || "250";
+    const categoryId = unicornPlatform.categoryId || "456";
+    const familyId = unicornPlatform.familyId || "94";
+    const groupIds = unicornPlatform.groupIds || "57,58";
+
+    const payload = {
+      category_id: categoryId,
+      family_id: familyId,
+      group_ids: groupIds,
+      option_ids: `${code},${storageOptionId}`,
+    };
+
+    const res = await axios.post(
+      unicornPlatform.apiUrl ||
+        "https://fe01.beamcommerce.in/get_product_by_option_id",
+      payload,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "content-type": "application/json",
+          "customer-id": "unicorn",
+          origin: "https://shop.unicornstore.in",
+          referer: "https://shop.unicornstore.in/",
+        },
+        timeout: 10_000,
+      }
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Unicorn API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request for Vijay Sales (requires pincode)
+const vijaySalesCustomRequest = async ({ pincode, code, axios }) => {
+  try {
+    const params = new URLSearchParams({
+      pincode: String(pincode),
+      vanNo: String(code),
+      storeList: "true",
+    });
+
+    const url = `https://mdm.vijaysales.com/web/api/oms/check-servicibility/v1?${params.toString()}`;
+    const res = await axios.get(url, {
+      headers: {
+        accept: "*/*",
+        origin: "https://www.vijaysales.com",
+        referer: "https://www.vijaysales.com/",
+        "user-agent":
+          "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142 Mobile Safari/537.36",
+      },
+      timeout: 10_000,
+    });
+    return res.data;
+  } catch (err) {
+    console.error("Vijay Sales API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request for Sangeetha (requires pincode)
+const sangeethaCustomRequest = async ({ pincode, code, axios }) => {
+  try {
+    const payload = {
+      type: "pwa",
+      product_id: String(code),
+      pinCode: String(pincode),
+      user_id: "70638581",
+      user_location: "AutoCheck",
+    };
+
+    const res = await axios.post(
+      "https://www.sangeethamobiles.com/b/customer/api/v3/product-eta-details",
+      payload,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "content-type": "application/json",
+          origin: "https://www.sangeethamobiles.com",
+          referer: "https://www.sangeethamobiles.com/",
+          "user-agent":
+            "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36",
+          number1: "1",
+          number2: "1",
+        },
+        timeout: 15_000,
+      }
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Sangeetha API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
 // Custom request function for Amazon PAAPI v5 (no pincode)
 const amazonCustomRequest = async ({ code, axios }) => {
   const crypto = await import("crypto");
@@ -540,6 +652,9 @@ attachCustomRequest("Flipkart", flipkartCustomRequest);
 attachCustomRequest("Reliance Digital", relianceDigitalCustomRequest);
 attachCustomRequest("iQOO", iqooCustomRequest);
 attachCustomRequest("Vivo", vivoCustomRequest);
+attachCustomRequest("Unicorn", unicornCustomRequest);
+attachCustomRequest("Vijay Sales", vijaySalesCustomRequest);
+attachCustomRequest("Sangeetha", sangeethaCustomRequest);
 // attachCustomRequest("Amazon", amazonCustomRequest);
 
 // Export for use in index.js

@@ -247,27 +247,27 @@ export const PLATFORMS = [
       {
         id: "313",
         name: "iPhone 17 Lavender 256GB",
-        url: "https://shop.unicornstore.in/iphone-17",
+        url: "https://shop.unicornstore.in/type/iphone-17",
       },
       {
         id: "311",
         name: "iPhone 17 Sage 256GB",
-        url: "https://shop.unicornstore.in/iphone-17",
+        url: "https://shop.unicornstore.in/type/iphone-17",
       },
       {
         id: "312",
         name: "iPhone 17 Mist Blue 256GB",
-        url: "https://shop.unicornstore.in/iphone-17",
+        url: "https://shop.unicornstore.in/type/iphone-17",
       },
       {
         id: "314",
         name: "iPhone 17 White 256GB",
-        url: "https://shop.unicornstore.in/iphone-17",
+        url: "https://shop.unicornstore.in/type/iphone-17",
       },
       {
         id: "315",
         name: "iPhone 17 Black 256GB",
-        url: "https://shop.unicornstore.in/iphone-17",
+        url: "https://shop.unicornstore.in/type/iphone-17",
       },
     ],
   },

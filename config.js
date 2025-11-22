@@ -313,30 +313,45 @@ export const PLATFORMS = [
     apiKey: null,
     pincodes: ["122001", "110005"],
     products: [
+      // {
+      //   id: "19685",
+      //   name: "iPhone 17 Sage 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19685",
+      // },
+      // {
+      //   id: "19681",
+      //   name: "iPhone 17 Lavender 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19681",
+      // },
+      // {
+      //   id: "19678",
+      //   name: "iPhone 17 White 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19678",
+      // },
+      // {
+      //   id: "19680",
+      //   name: "iPhone 17 Black 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19680",
+      // },
+      // {
+      //   id: "19683",
+      //   name: "iPhone 17 Mist Blue 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19683",
+      // },
+    ],
+  },
+  {
+    name: "OPPO",
+    apiUrl:
+      "https://opsg-gateway-in.oppo.com/v2/api/rest/mall/product/detail/fetch",
+    method: "POST",
+    apiKey: null,
+    pincodes: ["122001"],
+    products: [
       {
-        id: "19685",
-        name: "iPhone 17 Sage 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19685",
-      },
-      {
-        id: "19681",
-        name: "iPhone 17 Lavender 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19681",
-      },
-      {
-        id: "19678",
-        name: "iPhone 17 White 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19678",
-      },
-      {
-        id: "19680",
-        name: "iPhone 17 Black 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19680",
-      },
-      {
-        id: "19683",
-        name: "iPhone 17 Mist Blue 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19683",
+        id: "P1110099",
+        name: "OPPO Find X9",
+        url: "https://www.oppo.com/in/product/find-x9",
       },
     ],
   },

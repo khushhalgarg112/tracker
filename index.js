@@ -8,7 +8,7 @@ dotenv.config();
 import { PINCODES, PLATFORMS } from "./config.js";
 import { callStockAPI, attachCustomRequest } from "./services/apiClient.js";
 import { applePickupCheck } from "./services/apiClient.js";
-import { sendTelegram } from "./services/telegramService.js";
+import { sendTelegram, sendOppoTelegram } from "./services/telegramService.js";
 
 /*
 How this runner works:
@@ -49,6 +49,9 @@ const getProductLink = (platformName, productId, productUrl) => {
   }
   if (platformName === "Vivo") {
     return `https://mshop.vivo.com/in/product/${productId}`;
+  }
+  if (platformName === "OPPO") {
+    return `https://www.oppo.com/in/product/find-x9`;
   }
   if (platformName === "Amazon") {
     return `https://www.amazon.in/dp/${productId}`;
@@ -370,6 +373,38 @@ const getSangeethaAvailabilityDetails = (resData) => {
   }
 };
 
+// Helper function to get OPPO availability details
+const getOppoAvailabilityDetails = (resData) => {
+  try {
+    if (!resData || !resData.success || !resData.data) return null;
+
+    const products = resData.data.products || [];
+    const inStockProducts = [];
+
+    for (const product of products) {
+      // Check stockStatus: 1 = in stock, 0 = out of stock
+      if (product.stockStatus === 1) {
+        inStockProducts.push({
+          skuCode: product.skuCode,
+          name: product.name,
+          cnName: product.cnName,
+          imageUrl: product.imageUrl,
+          stockStatus: product.stockStatus,
+        });
+      }
+    }
+
+    return {
+      available: inStockProducts.length > 0,
+      inStockProducts,
+      totalProducts: products.length,
+    };
+  } catch (err) {
+    console.error("Error parsing OPPO availability:", err.message);
+    return null;
+  }
+};
+
 const detectAvailability = (platformName, code, pincode, resData) => {
   if (!resData) return false;
 
@@ -444,6 +479,12 @@ const detectAvailability = (platformName, code, pincode, resData) => {
 
   if (platformName === "Sangeetha") {
     const availabilityDetails = getSangeethaAvailabilityDetails(resData);
+    return availabilityDetails?.available === true;
+  }
+
+  // OPPO-specific detection
+  if (platformName === "OPPO") {
+    const availabilityDetails = getOppoAvailabilityDetails(resData);
     return availabilityDetails?.available === true;
   }
 
@@ -557,9 +598,9 @@ const checkAppleStock = async () => {
   }
 };
 
-// Separate function to check platforms without pincode (iQOO, Vivo, Unicorn)
+// Separate function to check platforms without pincode (iQOO, Vivo, Unicorn, OPPO)
 const checkPlatformsWithoutPincode = async () => {
-  const platformsWithoutPincode = ["iQOO", "Vivo", "Unicorn"]; // Removed "Amazon" - disabled
+  const platformsWithoutPincode = ["iQOO", "Vivo", "Unicorn", "OPPO"]; // Removed "Amazon" - disabled
 
   for (const platform of PLATFORMS) {
     if (!platformsWithoutPincode.includes(platform.name)) continue;
@@ -607,10 +648,25 @@ const checkPlatformsWithoutPincode = async () => {
                 text += `SKU: ${details.sku}\n`;
               }
             }
+          } else if (platform.name === "OPPO") {
+            const details = getOppoAvailabilityDetails(data);
+            if (details && details.inStockProducts.length > 0) {
+              text += `\n📦 *Available Variants:*\n`;
+              for (const variant of details.inStockProducts) {
+                text += `\n• ${variant.name || variant.cnName}\n`;
+              }
+              text += `\nTotal: ${details.inStockProducts.length} variant(s) in stock`;
+            }
           }
 
           console.log("ALERT ->", platform.name, productId);
-          await sendTelegram(text);
+
+          // Use OPPO-specific Telegram channel if available
+          if (platform.name === "OPPO") {
+            await sendOppoTelegram(text);
+          } else {
+            await sendTelegram(text);
+          }
           await sleep(500);
         } else {
           console.log("No stock:", platform.name, productId);
@@ -655,8 +711,12 @@ const checkStock = async () => {
 
   // Check other platforms with pincode iteration
   for (const platform of PLATFORMS) {
-    // Skip Apple, Amazon as they're disabled, and iQOO, Vivo as they're handled separately
-    if (["Apple", "Amazon", "iQOO", "Vivo", "Unicorn"].includes(platform.name))
+    // Skip Apple, Amazon as they're disabled, and iQOO, Vivo, Unicorn, OPPO as they're handled separately
+    if (
+      ["Apple", "Amazon", "iQOO", "Vivo", "Unicorn", "OPPO"].includes(
+        platform.name
+      )
+    )
       continue;
 
     // Also skip if platform has no products

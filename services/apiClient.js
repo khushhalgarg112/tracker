@@ -552,6 +552,52 @@ const sangeethaCustomRequest = async ({ pincode, code, axios }) => {
   }
 };
 
+// Custom request function for OPPO (no pincode)
+const oppoCustomRequest = async ({ code, axios }) => {
+  try {
+    const url =
+      "https://opsg-gateway-in.oppo.com/v2/api/rest/mall/product/detail/fetch";
+    const payload = {
+      productCode: String(code),
+      userGroupName: "",
+      storeViewCode: "in",
+      configModule: 3,
+      settleChannel: 3,
+    };
+
+    const res = await axios.post(url, payload, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "accept-language": "en-US,en;q=0.7",
+        "content-type": "application/json",
+        origin: "https://www.oppo.com",
+        priority: "u=1, i",
+        referer: "https://www.oppo.com/",
+        "sec-ch-ua":
+          '"Chromium";v="142", "Brave";v="142", "Not_A Brand";v="99"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "sec-gpc": "1",
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+        Cookie: "frontend=3c8c9e4681264ff0a56b9b02850e200a",
+      },
+      timeout: 10_000,
+    });
+    return res.data;
+  } catch (err) {
+    console.error("OPPO API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
 // Custom request function for Amazon PAAPI v5 (no pincode)
 const amazonCustomRequest = async ({ code, axios }) => {
   const crypto = await import("crypto");
@@ -655,6 +701,7 @@ attachCustomRequest("Vivo", vivoCustomRequest);
 attachCustomRequest("Unicorn", unicornCustomRequest);
 attachCustomRequest("Vijay Sales", vijaySalesCustomRequest);
 attachCustomRequest("Sangeetha", sangeethaCustomRequest);
+attachCustomRequest("OPPO", oppoCustomRequest);
 // attachCustomRequest("Amazon", amazonCustomRequest);
 
 // Export for use in index.js

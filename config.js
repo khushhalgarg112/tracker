@@ -348,11 +348,11 @@ export const PLATFORMS = [
     apiKey: null,
     pincodes: ["122001"],
     products: [
-      {
-        id: "P1110099",
-        name: "OPPO Find X9",
-        url: "https://www.oppo.com/in/product/find-x9",
-      },
+      // {
+      //   id: "P1110099",
+      //   name: "OPPO Find X9",
+      //   url: "https://www.oppo.com/in/product/find-x9",
+      // },
     ],
   },
 ];

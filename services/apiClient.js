@@ -517,11 +517,10 @@ const vijaySalesCustomRequest = async ({ pincode, code, axios }) => {
 const sangeethaCustomRequest = async ({ pincode, code, axios }) => {
   try {
     const payload = {
-      type: "pwa",
+      type: "desktop",
       product_id: String(code),
       pinCode: String(pincode),
-      user_id: "70638581",
-      user_location: "AutoCheck",
+      user_id: "",
     };
 
     const res = await axios.post(
@@ -530,20 +529,52 @@ const sangeethaCustomRequest = async ({ pincode, code, axios }) => {
       {
         headers: {
           accept: "application/json, text/plain, */*",
+          "accept-language": "en-US,en;q=0.8",
           "content-type": "application/json",
+          cookie:
+            "__guest_fingerprint=28f9d9cf-de81-4f9e-eeb7-dd53f9528763; superauserwooblyads=d148f391-22be-4a77-ba7d-655991564335; cookieAllowed=accepted; ph_phc_5gTb5cKyB4bpGngoJtohVMdhYYJ9lyNEm8vJFXCkaH7_posthog=%7B%22distinct_id%22%3A%22019aa783-9d53-787d-b8e7-cec52f39f0d4%22%2C%22%24sesid%22%3A%5B1763805489694%2C%22019aaaff-da4d-737e-b15e-565537877f68%22%2C1763805485643%5D%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22https%3A%2F%2Fsearch.brave.com%2F%22%2C%22u%22%3A%22https%3A%2F%2Fwww.sangeethamobiles.com%2F%22%7D%7D; sanUserCode=2820840e-9685-67c6-916d-d27d36d4cd6f-1763901686830; AWSALB=jLnTuztiDAAt5XhfqxfQ2dIuqA+ZvciW/FtSLeq2igOqt1CrUe1H/7PfApVQAlZQPsjFUp9916mwvzk6yyCXNHgpjjFFSFIdhLHRoVEdO74YHh9yrsgRUKtnI3q5; AWSALBCORS=jLnTuztiDAAt5XhfqxfQ2dIuqA+ZvciW/FtSLeq2igOqt1CrUe1H/7PfApVQAlZQPsjFUp9916mwvzk6yyCXNHgpjjFFSFIdhLHRoVEdO74YHh9yrsgRUKtnI3q5",
+          number1:
+            "18j3bX3AFk4trD#2icbB6ak3H@&OK1L0geZ0Nry5Y$o1EVa^F1k1$GZ6&QwK",
+          number2:
+            "9bcFbw29SimO6v0ArwLw$9)N5U9G3NQOHadxL6fFvA8bDYbYw7tmX#Ia6VFD5Wk3lz&6yNNt",
           origin: "https://www.sangeethamobiles.com",
-          referer: "https://www.sangeethamobiles.com/",
+          priority: "u=1, i",
+          referer: `https://www.sangeethamobiles.com/product-details/apple-iphone-17-512gb-white-apple-iphone-17-512gb-white/${code}`,
+          "sec-ch-ua":
+            '"Chromium";v="142", "Brave";v="142", "Not_A Brand";v="99"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          "sec-gpc": "1",
           "user-agent":
-            "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36",
-          number1: "1",
-          number2: "1",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
         },
         timeout: 15_000,
       }
     );
     return res.data;
   } catch (err) {
-    console.error("Sangeetha API error:", err.message);
+    // Handle 500 errors gracefully
+    if (err.response && err.response.status === 500) {
+      console.error(
+        `[Sangeetha] Server error (500) for product ${code}, pincode ${pincode}`
+      );
+      // Return a structured error response similar to check_sangeetha_store pattern
+      return {
+        error: true,
+        status: 500,
+        message: "Server error - API returned 500",
+        total: 0,
+        found: 0,
+      };
+    }
+
+    console.error(
+      `[Sangeetha] API error for product ${code}, pincode ${pincode}:`,
+      err.message
+    );
     if (err.response) {
       console.error("Response status:", err.response.status);
       console.error("Response data:", err.response.data);

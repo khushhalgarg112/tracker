@@ -358,6 +358,14 @@ const getVijaySalesAvailabilityDetails = (code, resData) => {
 // Helper function to get Sangeetha availability details
 const getSangeethaAvailabilityDetails = (resData) => {
   try {
+    // Handle error responses (e.g., 500 errors)
+    if (resData?.error === true) {
+      console.error(
+        `[Sangeetha] Error response: ${resData.message || "Unknown error"}`
+      );
+      return null;
+    }
+
     const eta = resData?.data?.product_eta;
     if (!eta) return null;
 

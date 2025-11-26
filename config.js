@@ -164,31 +164,31 @@ export const PLATFORMS = [
     apiKey: null,
     pincodes: ["122001", "485001"], // Multiple pincodes for Reliance Digital
     products: [
-      {
-        id: "494741625",
-        name: "Apple iPhone 17 256 GB, White",
-        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-white-mff8s2-9391633?internal_source=search_collection",
-      },
-      {
-        id: "494741626",
-        name: "Apple iPhone 17 256 GB, Mist Blue",
-        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-mist-blue-mff8s5-9391645?internal_source=search_collection",
-      },
-      {
-        id: "494741624",
-        name: "Apple iPhone 17 256 GB, Black",
-        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-black-mff8ru-9391619?internal_source=search_collection",
-      },
-      {
-        id: "494741627",
-        name: "Apple iPhone 17 256 GB, Lavender",
-        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-lavender-mff8ry-9391624?internal_source=search_collection",
-      },
-      {
-        id: "494741628",
-        name: "Apple iPhone 17 256 GB, Sage",
-        url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-sage-mff8s3-9391641?internal_source=search_collection",
-      },
+      // {
+      //   id: "494741625",
+      //   name: "Apple iPhone 17 256 GB, White",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-white-mff8s2-9391633?internal_source=search_collection",
+      // },
+      // {
+      //   id: "494741626",
+      //   name: "Apple iPhone 17 256 GB, Mist Blue",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-mist-blue-mff8s5-9391645?internal_source=search_collection",
+      // },
+      // {
+      //   id: "494741624",
+      //   name: "Apple iPhone 17 256 GB, Black",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-black-mff8ru-9391619?internal_source=search_collection",
+      // },
+      // {
+      //   id: "494741627",
+      //   name: "Apple iPhone 17 256 GB, Lavender",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-lavender-mff8ry-9391624?internal_source=search_collection",
+      // },
+      // {
+      //   id: "494741628",
+      //   name: "Apple iPhone 17 256 GB, Sage",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-sage-mff8s3-9391641?internal_source=search_collection",
+      // },
     ],
   },
   {

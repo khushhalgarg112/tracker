@@ -5,9 +5,13 @@ import axios from "axios";
 
 dotenv.config();
 
-import { PINCODES, PLATFORMS } from "./config.js";
-import { callStockAPI, attachCustomRequest } from "./services/apiClient.js";
-import { applePickupCheck } from "./services/apiClient.js";
+import { PINCODES, PLATFORMS, BIGBASKET_TRACKERS } from "./config.js";
+import {
+  callStockAPI,
+  attachCustomRequest,
+  applePickupCheck,
+} from "./services/apiClient.js";
+import { checkBigbasketOffers } from "./services/bigbasketService.js";
 import { sendTelegram, sendOppoTelegram } from "./services/telegramService.js";
 
 /*
@@ -710,6 +714,9 @@ const checkStock = async () => {
       }
     }
   }
+
+  // BigBasket search tracking (pages configured in config.js)
+  await checkBigbasketOffers(BIGBASKET_TRACKERS);
 
   // Check Apple separately (no pincode iteration) - DISABLED
   // await checkAppleStock();

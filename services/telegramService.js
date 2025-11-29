@@ -3,9 +3,18 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const TELEGRAM_BASE = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`;
+const TELEGRAM_BASE = process.env.TELEGRAM_BOT_TOKEN
+  ? `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`
+  : null;
+const QUICK_COMMERCE_BASE = process.env.QUICK_COMMERCE_BOT
+  ? `https://api.telegram.org/bot${process.env.QUICK_COMMERCE_BOT}`
+  : null;
 
 export const sendTelegram = async (text, chatId = null) => {
+  if (!TELEGRAM_BASE) {
+    console.warn("TELEGRAM_BOT_TOKEN missing - skipping default Telegram send");
+    return;
+  }
   try {
     const url = `${TELEGRAM_BASE}/sendMessage`;
     const targetChatId = chatId || process.env.TELEGRAM_CHAT_ID;
@@ -48,5 +57,29 @@ export const sendOppoTelegram = async (text) => {
     } catch (fallbackErr) {
       console.error("Fallback Telegram send error:", fallbackErr.message);
     }
+  }
+};
+
+export const sendQuickCommerceTelegram = async (text, chatId = null) => {
+  if (!QUICK_COMMERCE_BASE) {
+    console.warn(
+      "QUICK_COMMERCE_BOT missing - falling back to default Telegram sender"
+    );
+    await sendTelegram(text, chatId);
+    return;
+  }
+
+  try {
+    const url = `${QUICK_COMMERCE_BASE}/sendMessage`;
+    const targetChatId = chatId || process.env.QUICK_COMMERCE_ID;
+    await axios.post(url, {
+      chat_id: targetChatId,
+      text,
+      parse_mode: "Markdown",
+      disable_notification: false,
+    });
+  } catch (err) {
+    console.error("Quick Commerce Telegram send error:", err.message);
+    await sendTelegram(text, chatId);
   }
 };

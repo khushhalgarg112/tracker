@@ -1,5 +1,30 @@
 export const PINCODES = ["122001"];
 
+export const BIGBASKET_TRACKERS = [
+  {
+    slug: "iphone",
+    bucketId: "92",
+    pages: [1, 2, 3, 4],
+    brandWhitelist: ["Apple"],
+    categoryWhitelist: ["type=pc&slug=smartphones"],
+    products: [
+      {
+        name: "iPhone 17",
+        matchers: ["iphone 17"],
+      },
+      {
+        name: "iPhone 16",
+        matchers: ["iphone 16"],
+      },
+      {
+        name: "iPhone 15",
+        matchers: ["iphone 15"],
+      },
+    ],
+    label: "Apple iPhone (15/16/17) offers",
+  },
+];
+
 export const PLATFORMS = [
   {
     name: "Croma",

@@ -223,16 +223,16 @@ export const PLATFORMS = [
     apiKey: null,
     pincodes: ["122001", "485001"],
     products: [
-      {
-        id: "2057",
-        name: "Iqoo Neo 10R ",
-        url: "https://shop.iqoo.com/in/product/2057?cid=noPreload&_gl=1%2ah7x205%2a_ga%2aMTUwMjg5MDA5MC4xNzYzMjgzNDUw%2a_ga_JX6ZMMBG2R%2aczE3NjMyODM0NDkkbzEkZzEkdDE3NjMyODM1MTgkajUyJGwwJGgw",
-      },
-      {
-        id: "2063",
-        name: "Iqoo Neo 10",
-        url: "https://shop.iqoo.com/in/product/2063?skuId=8375",
-      },
+      // {
+      //   id: "2057",
+      //   name: "Iqoo Neo 10R ",
+      //   url: "https://shop.iqoo.com/in/product/2057?cid=noPreload&_gl=1%2ah7x205%2a_ga%2aMTUwMjg5MDA5MC4xNzYzMjgzNDUw%2a_ga_JX6ZMMBG2R%2aczE3NjMyODM0NDkkbzEkZzEkdDE3NjMyODM1MTgkajUyJGwwJGgw",
+      // },
+      // {
+      //   id: "2063",
+      //   name: "Iqoo Neo 10",
+      //   url: "https://shop.iqoo.com/in/product/2063?skuId=8375",
+      // },
     ],
   },
   {

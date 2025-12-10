@@ -248,15 +248,34 @@ export const PLATFORMS = [
   },
   {
     name: "Amazon",
-    apiUrl: "https://webservices.amazon.in/paapi5/getitems",
-    method: "POST",
+    apiUrl:
+      "https://www.amazon.in/gp/product/ajax/twisterDimensionSlotsDefault",
+    method: "GET",
     apiKey: null,
     pincodes: [], // No pincode needed for Amazon
-    products: [], // Disabled - Amazon API credentials not available
-    // products: [
-    //   // Add your Amazon products here when you have API credentials
-    //   // Format: { id: "ASIN", name: "Product Name", url: "https://amazon.in/..." }
-    // ],
+    parentAsin: "B0DS5YTRZ3", // Parent ASIN for iPhone variants
+    products: [
+      {
+        id: "B0FQF9ZY2X",
+        name: "iPhone 17 Blue",
+        url: "https://www.amazon.in/dp/B0FQF9ZY2X",
+      },
+      {
+        id: "B0FQFLQ2CQ",
+        name: "iPhone 17 Blue",
+        url: "https://www.amazon.in/dp/B0FQFLQ2CQ",
+      },
+      {
+        id: "B0FQFLZNKL",
+        name: "iPhone 17 Green",
+        url: "https://www.amazon.in/dp/B0FQFLZNKL",
+      },
+      {
+        id: "B0FQFYXCC4",
+        name: "iPhone 17 Black",
+        url: "https://www.amazon.in/dp/B0FQFYXCC4",
+      },
+    ],
   },
   {
     name: "Unicorn",

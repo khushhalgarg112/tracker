@@ -293,6 +293,21 @@ const getIqooVivoAvailabilityDetails = (resData) => {
 // Helper function to get Amazon availability details
 const getAmazonAvailabilityDetails = (resData) => {
   try {
+    // Check for Twister API response format
+    if (resData && resData.Value && resData.Value.content) {
+      const twisterSlotJson = resData.Value.content.twisterSlotJson;
+      if (twisterSlotJson !== undefined) {
+        return {
+          available: twisterSlotJson.isAvailable === true,
+          message: twisterSlotJson.isAvailable
+            ? "Available"
+            : "Currently unavailable",
+          asin: resData.ASIN || null,
+        };
+      }
+    }
+
+    // Fallback to PAAPI v5 format (if used)
     const items = resData.ItemsResult?.Items || [];
     if (items.length === 0) return null;
 
@@ -610,9 +625,9 @@ const checkAppleStock = async () => {
   }
 };
 
-// Separate function to check platforms without pincode (iQOO, Vivo, Unicorn, OPPO)
+// Separate function to check platforms without pincode (iQOO, Vivo, Unicorn, OPPO, Amazon)
 const checkPlatformsWithoutPincode = async () => {
-  const platformsWithoutPincode = ["iQOO", "Vivo", "Unicorn", "OPPO"]; // Removed "Amazon" - disabled
+  const platformsWithoutPincode = ["iQOO", "Vivo", "Unicorn", "OPPO", "Amazon"];
 
   for (const platform of PLATFORMS) {
     if (!platformsWithoutPincode.includes(platform.name)) continue;
@@ -668,6 +683,14 @@ const checkPlatformsWithoutPincode = async () => {
                 text += `\n• ${variant.name || variant.cnName}\n`;
               }
               text += `\nTotal: ${details.inStockProducts.length} variant(s) in stock`;
+            }
+          } else if (platform.name === "Amazon") {
+            const details = getAmazonAvailabilityDetails(data);
+            if (details) {
+              text += `\n📦 Status: ${details.message || "Available"}\n`;
+              if (details.asin) {
+                text += `ASIN: ${details.asin}\n`;
+              }
             }
           }
 
@@ -726,9 +749,9 @@ const checkStock = async () => {
 
   // Check other platforms with pincode iteration
   for (const platform of PLATFORMS) {
-    // Skip Apple, Amazon as they're disabled, and iQOO, Vivo, Unicorn, OPPO as they're handled separately
+    // Skip Apple as it's disabled, and iQOO, Vivo, Unicorn, OPPO, Amazon as they're handled separately
     if (
-      ["Apple", "Amazon", "iQOO", "Vivo", "Unicorn", "OPPO"].includes(
+      ["Apple", "iQOO", "Vivo", "Unicorn", "OPPO", "Amazon"].includes(
         platform.name
       )
     )

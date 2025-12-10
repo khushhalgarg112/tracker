@@ -629,7 +629,7 @@ const oppoCustomRequest = async ({ code, axios }) => {
   }
 };
 
-// Custom request function for Amazon PAAPI v5 (no pincode)
+// Custom request function for Amazon PAAPI v5 (no pincode) - DISABLED
 const amazonCustomRequest = async ({ code, axios }) => {
   const crypto = await import("crypto");
   const hmac = crypto.createHmac;
@@ -722,6 +722,72 @@ const amazonCustomRequest = async ({ code, axios }) => {
   }
 };
 
+// Custom request function for Amazon Twister API (no pincode)
+// Uses the twisterDimensionSlotsDefault endpoint to check availability
+const amazonTwisterCustomRequest = async ({ code, axios }) => {
+  try {
+    // Get Amazon platform config for additional params if needed
+    const amazonPlatform = PLATFORMS.find((p) => p.name === "Amazon") || {};
+    const parentAsin = amazonPlatform.parentAsin || "B0DS5YTRZ3"; // Default parent ASIN from curl
+    const qid = Math.floor(Date.now() / 1000); // Generate current timestamp as qid
+
+    const url =
+      "https://www.amazon.in/gp/product/ajax/twisterDimensionSlotsDefault";
+    const params = {
+      isDimensionSlotsAjax: "1",
+      asinList: code,
+      vs: "1",
+      asin: code,
+      productTypeDefinition: "CELLULAR_PHONE",
+      productGroupId: "premium_ce_brands_display_on_website",
+      parentAsin: parentAsin,
+      isPrime: "0",
+      qid: qid.toString(),
+      sr: "8-6",
+      keywords: "iphone+17",
+      deviceOs: "unrecognized",
+      landingAsin: code,
+      deviceType: "web",
+      showFancyPrice: "false",
+      twisterFlavor: "twisterPlusDesktopConfigurator",
+    };
+
+    const headers = {
+      accept: "text/html,*/*",
+      "accept-language": "en-US,en;q=0.7",
+      priority: "u=1, i",
+      referer: `https://www.amazon.in/dp/${code}`,
+      "sec-ch-ua": '"Brave";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+      "sec-ch-ua-platform-version": '"19.0.0"',
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      "sec-gpc": "1",
+      "user-agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "x-requested-with": "XMLHttpRequest",
+      Cookie:
+        'session-id=260-1126426-7541216; i18n-prefs=INR; lc-acbin=en_IN; ubid-acbin=261-4435401-2469803; csm-sid=657-5481649-7174659; sso-state-acbin=Xdsso|ZQGXvf3m_CjavT-DUC_LyDWx89HgoJSGPf31NViQmQXTdTfDK2kemfNlto5stNortNt9LhA5q4TCMlYnWUOwKBvP7rg0BF3sCwfalc_h_26Im53p; at-acbin=Atza|gQCO02jZAwEBArKcU3CC0fy156IZcSEYZ5i7HkrMuJpJ1jVhzJtZboLLTYZwb-7Ik5RvVhzPKl-BR1vlmlLxr24T3ry8X-Pn7YcxpCS3uTIoV8HXaJ303UpusQ0B5rkCr18NUBDHa08Twngcvb-fgmqMo3uDExbMy4ADpfD3mpFb-lZYJJ_63IeR4HgyjKAXKRxqG9N7aRwxlP2cySccRCD0KetYJq7UYbhjCPSbLEqoxUBKIVC2cKHxsViKUTc6_jNSRpKCpT_YXsz_9cjB4Zb3y-OQzWCiRNjQsDyppzJ8WMRW-Fd8YWdOTt1lJj2QBlH3bD2bO39xom4bn_sva3JAdp5JOXYl-VRpPAWSqAYZWD4jBCmANk9BE47OgrFceSxG6ZoyDGni29akFSyvCOGtDjXf0WseYrFvIGKQOmKVbg; sess-at-acbin=X/gkVPgZp074VrtgNFY4Omhh/x5BUjFMZikV54Wt6h8=; sst-acbin=Sst1|PQHHwQYnaSMkqc3oQiCykpDwCTIcQVx3X7CH-C7N-zzOi4gb8qrr5HjyFNQnjdexxSehFybmjI286LVYG6w2UMqwSwj2Ef8LUec8b7Vejs-DsSS4WSJt1DtueqYM3eJ6Q_53lFIGVmF6-hFg0idHf4CvJWvPmbmADZ4aQtFr-2MeV4kidkd_J8ABI4mJRSDPlhY9dIcWQI3bUH6QlUp-L0QCSvUl_Mk65eN9bkAmGqbGEoe2UqKpbN14AlzWzh64k2XMGV5kdVatNOjAMVq_vSAiGPMmN3aT0lrs0LJx_mY0KAY; session-id-time=2082787201l; session-token=8T6XrSpLpllZIgr//Iy+o8uydDx2jfSsYJYwBatb8YqWTKir2Z7eEJmZXfLFZezthywpIt7fqHWD49vo3LwLYlAtylfCv0jtG6kbvzkkoVIbnACUmObE2Oxh+nsAP+8mBnYIFqehWz/nyhFR++ttMvRzEv7XORPZLyayWg1uodQkr1VELUFA9nscrWu4jV1ddAjCJtNiGZ+tVtyiBko4CNgSmoULvut8KJK4jxcOY4i9oEllRkwb9LcQEbTcZR1ImXFhgJHsNsoQj3A+8G7YJnNxnm0uGTJFQLSKl1UAZCXhcB/eeUTNMSwjZX9hs2fZ1V0fJGySl+aep8kP11XtpfFwJaNDSDdTjDXOOmU82twfkR4fvQiKZ7lhFy2LpJjK; x-acbin="4G6xVliVFAeX98UTadehjb7MmE5z8oYN0sEzDXgzaEG4Iljxe3LiVzblH59YMr@8"; rxc=AE4r77bCU4ZKg8g6JNE; csm-hit=tb:s-J8384YXCKKW4NB0SVD0G|1765386165249&t:1765386165249&adb:adblk_yes; session-token=K17Cp5rxLWR7115b4WKzIAZUE6C86AYXZvtfw2G4oTk9n5tGk/i7YaaeR6rFuuIWAK+yBTyoUk5xX0kop4DnUe1J9kSJjkZzDDpSc9QKULi452l9llO5ExbroCNbXCpGRHyU//iYjHiXlcxeR+oqmXszkZWd9VhvNqJ00OME7bDRc+qg2Bnb3Zuq2bFGB1sNomKhxkJ0afvTnHq7/g7357S9Jq8AFvyltEsb8dX3DAm+0VGwY7ijyBxyeV1vjP21+z2esJb0XLx7V2L7lk0uQkf35ZSHteqlOaOTp7g46GRuIA6mDZPCuH4yM81fbo+R/jjaNTgpiqPoe3aOufcLDR6vaQfYJbpooR4xQiIL2tThZsIg+N03SWjrhAApo/ZK; x-acbin="TnRI9s22z0cl4K61KIn@PP8CFjtW@nljsc9?1OXL9Tgybl0B?2Ya1LuTaGn2W1R4"',
+    };
+
+    const res = await axios.get(url, {
+      params,
+      headers,
+      timeout: 15_000,
+    });
+    return res.data;
+  } catch (err) {
+    console.error(`[Amazon Twister] API error for ASIN ${code}:`, err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
 // Initialize custom requests
 attachCustomRequest("Croma", cromaCustomRequest);
 attachCustomRequest("Samsung", samsungCustomRequest);
@@ -733,7 +799,8 @@ attachCustomRequest("Unicorn", unicornCustomRequest);
 attachCustomRequest("Vijay Sales", vijaySalesCustomRequest);
 attachCustomRequest("Sangeetha", sangeethaCustomRequest);
 attachCustomRequest("OPPO", oppoCustomRequest);
-// attachCustomRequest("Amazon", amazonCustomRequest);
+attachCustomRequest("Amazon", amazonTwisterCustomRequest);
+// attachCustomRequest("Amazon", amazonCustomRequest); // PAAPI v5 - disabled
 
 // Export for use in index.js
 export { applePickupCheck };

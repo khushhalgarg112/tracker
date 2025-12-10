@@ -275,11 +275,11 @@ export const PLATFORMS = [
         name: "iPhone 17 Black",
         url: "https://www.amazon.in/dp/B0FQFYXCC4",
       },
-      {
-        id: "B0DGJHBX5Y",
-        name: "iPhone 16 Black",
-        url: "https://www.amazon.in/dp/B0DGJHBX5Y",
-      },
+      // {
+      //   id: "B0DGJHBX5Y",
+      //   name: "iPhone 16 Black",
+      //   url: "https://www.amazon.in/dp/B0DGJHBX5Y",
+      // },
     ],
   },
   {

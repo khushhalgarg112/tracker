@@ -12,7 +12,11 @@ import {
   applePickupCheck,
 } from "./services/apiClient.js";
 import { checkBigbasketOffers } from "./services/bigbasketService.js";
-import { sendTelegram, sendOppoTelegram } from "./services/telegramService.js";
+import {
+  sendTelegram,
+  sendOppoTelegram,
+  sendAmazonTelegram,
+} from "./services/telegramService.js";
 
 /*
 How this runner works:
@@ -696,9 +700,11 @@ const checkPlatformsWithoutPincode = async () => {
 
           console.log("ALERT ->", platform.name, productId);
 
-          // Use OPPO-specific Telegram channel if available
+          // Use platform-specific Telegram channel if available
           if (platform.name === "OPPO") {
             await sendOppoTelegram(text);
+          } else if (platform.name === "Amazon") {
+            await sendAmazonTelegram(text);
           } else {
             await sendTelegram(text);
           }

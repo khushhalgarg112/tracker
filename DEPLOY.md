@@ -32,6 +32,8 @@ Click "Environment" tab and add:
 ```
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 TELEGRAM_CHAT_ID=your-chat-id
+AMAZON_TELEGRAM_BOT=your-amazon-bot-token (optional, for Amazon-specific notifications)
+AMAZON_TELEGRAM_ID=your-amazon-chat-id (optional, for Amazon-specific notifications)
 APPLE_PROXIES=your-proxy-url (optional)
 ```
 

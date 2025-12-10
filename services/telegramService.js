@@ -60,6 +60,37 @@ export const sendOppoTelegram = async (text) => {
   }
 };
 
+export const sendAmazonTelegram = async (text) => {
+  try {
+    // Use Amazon-specific bot token if available, otherwise fallback to default
+    const amazonBotToken = process.env.AMAZON_TELEGRAM_BOT;
+    const amazonChatId = process.env.AMAZON_TELEGRAM_ID;
+
+    // If Amazon chat ID is set, use Amazon bot (or default bot)
+    if (amazonChatId) {
+      const amazonTelegramBase = `https://api.telegram.org/bot${amazonBotToken}`;
+      const url = `${amazonTelegramBase}/sendMessage`;
+      await axios.post(url, {
+        chat_id: amazonChatId,
+        text,
+        parse_mode: "Markdown",
+        disable_notification: false,
+      });
+    } else {
+      // Fallback to default chat if AMAZON_TELEGRAM_ID not set
+      await sendTelegram(text);
+    }
+  } catch (err) {
+    console.error("Amazon Telegram send error:", err.message);
+    // Fallback to default telegram if Amazon bot fails
+    try {
+      await sendTelegram(text);
+    } catch (fallbackErr) {
+      console.error("Fallback Telegram send error:", fallbackErr.message);
+    }
+  }
+};
+
 export const sendQuickCommerceTelegram = async (text, chatId = null) => {
   if (!QUICK_COMMERCE_BASE) {
     console.warn(

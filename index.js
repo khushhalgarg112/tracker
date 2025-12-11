@@ -767,21 +767,21 @@ const checkStock = async () => {
     }
   }
 
-  // BigBasket search tracking - call external API (config in Vercel app)
-  console.log("\n🔍 Calling external BigBasket API...");
-  try {
-    const response = await axios.post(
-      "https://inventory-rho-ten.vercel.app/api/bigbasket"
-    );
-    console.log("✅ External BigBasket API called successfully (POST)");
-    console.log("   Response:", response.data);
-  } catch (err) {
-    console.error("❌ Error calling external BigBasket API:", err.message);
-    if (err.response) {
-      console.error("   Status:", err.response.status);
-      console.error("   Data:", err.response.data);
-    }
-  }
+  // BigBasket search tracking - DISABLED (CORS/Access Denied issues)
+  // console.log("\n🔍 Calling external BigBasket API...");
+  // try {
+  //   const response = await axios.post(
+  //     "https://inventory-rho-ten.vercel.app/api/bigbasket"
+  //   );
+  //   console.log("✅ External BigBasket API called successfully (POST)");
+  //   console.log("   Response:", response.data);
+  // } catch (err) {
+  //   console.error("❌ Error calling external BigBasket API:", err.message);
+  //   if (err.response) {
+  //     console.error("   Status:", err.response.status);
+  //     console.error("   Data:", err.response.data);
+  //   }
+  // }
 
   // Check Apple separately (no pincode iteration) - DISABLED
   // await checkAppleStock();

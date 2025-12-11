@@ -5,13 +5,12 @@ import axios from "axios";
 
 dotenv.config();
 
-import { PINCODES, PLATFORMS, BIGBASKET_TRACKERS } from "./config.js";
+import { PINCODES, PLATFORMS } from "./config.js";
 import {
   callStockAPI,
   attachCustomRequest,
   applePickupCheck,
 } from "./services/apiClient.js";
-import { checkBigbasketOffers } from "./services/bigbasketService.js";
 import {
   sendTelegram,
   sendOppoTelegram,
@@ -297,6 +296,11 @@ const getIqooVivoAvailabilityDetails = (resData) => {
 // Helper function to get Amazon availability details
 const getAmazonAvailabilityDetails = (resData) => {
   try {
+    // Skip if this is an API error response
+    if (resData && resData._error === true) {
+      return null;
+    }
+
     // Check for Twister API response format
     if (resData && resData.Value && resData.Value.content) {
       const twisterSlotJson = resData.Value.content.twisterSlotJson;
@@ -437,7 +441,11 @@ const getOppoAvailabilityDetails = (resData) => {
 };
 
 const detectAvailability = (platformName, code, pincode, resData) => {
-  if (!resData) return false;
+  // Check for API errors - don't treat errors as "no stock"
+  if (!resData || resData._error === true) {
+    // Return null to indicate "unknown" status (not false for "no stock")
+    return null;
+  }
 
   // Apple-specific detection
   if (platformName === "Apple") {
@@ -660,6 +668,15 @@ const checkPlatformsWithoutPincode = async () => {
           data
         );
 
+        // Skip if API error (available === null means error/unknown)
+        if (available === null) {
+          console.log(
+            `⚠️ API error - skipping stock check: ${platform.name} ${productId}`
+          );
+          await sleep(1000);
+          continue;
+        }
+
         if (available) {
           const productLink = getProductLink(
             platform.name,
@@ -713,7 +730,13 @@ const checkPlatformsWithoutPincode = async () => {
           console.log("No stock:", platform.name, productId);
         }
 
-        await sleep(1000); // Delay between products
+        // Longer delay for Amazon to avoid rate limiting (3-5 seconds random)
+        if (platform.name === "Amazon") {
+          const amazonDelay = 3000 + Math.random() * 2000; // 3-5 seconds
+          await sleep(amazonDelay);
+        } else {
+          await sleep(1000); // Standard delay for other platforms
+        }
       } catch (err) {
         console.error("Error checking", platform.name, productId, err.message);
         await sleep(1000);
@@ -744,8 +767,21 @@ const checkStock = async () => {
     }
   }
 
-  // BigBasket search tracking (pages configured in config.js)
-  await checkBigbasketOffers(BIGBASKET_TRACKERS);
+  // BigBasket search tracking - call external API (config in Vercel app)
+  console.log("\n🔍 Calling external BigBasket API...");
+  try {
+    const response = await axios.post(
+      "https://inventory-rho-ten.vercel.app/api/bigbasket"
+    );
+    console.log("✅ External BigBasket API called successfully (POST)");
+    console.log("   Response:", response.data);
+  } catch (err) {
+    console.error("❌ Error calling external BigBasket API:", err.message);
+    if (err.response) {
+      console.error("   Status:", err.response.status);
+      console.error("   Data:", err.response.data);
+    }
+  }
 
   // Check Apple separately (no pincode iteration) - DISABLED
   // await checkAppleStock();

@@ -189,6 +189,16 @@ export const PLATFORMS = [
         name: "Apple iPhone 17 256 GB, Sage",
         url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-sage-mff8s3-9391641?internal_source=search_collection",
       },
+      {
+        id: "493839329",
+        name: "Apple iPhone 15 Plus 256 GB, Black",
+        url: "https://www.reliancedigital.in/product/apple-iphone-15-plus-256-gb-black-lmj3i9-7533823?internal_source=search_results",
+      },
+      {
+        id: "493839328",
+        name: "Apple iPhone 15 Plus 128 GB, Green",
+        url: "https://www.reliancedigital.in/product/apple-iphone-15-plus-128-gb-green-lmj3id-7533828?internal_source=search_results",
+      },
     ],
   },
   {
@@ -251,9 +261,19 @@ export const PLATFORMS = [
         url: "https://www.amazon.in/dp/B0FQFYXCC4",
       },
       // {
-      //   id: "B0DGJHBX5Y",
-      //   name: "iPhone 16 Black",
-      //   url: "https://www.amazon.in/dp/B0DGJHBX5Y",
+      //   id: "B0CHX1W1XY",
+      //   name: "iPhone 15 Black",
+      //   url: "https://www.amazon.in/dp/B0CHX1W1XY",
+      // },
+      // {
+      //   id: "B0CHX2F5QT",
+      //   name: "iPhone 15 White",
+      //   url: "https://www.amazon.in/dp/B0CHX2F5QT",
+      // },
+      // {
+      //   id: "B0CHX6NQMD",
+      //   name: "iPhone 15 Green",
+      //   url: "https://www.amazon.in/dp/B0CHX6NQMD",
       // },
     ],
   },
@@ -268,31 +288,31 @@ export const PLATFORMS = [
     familyId: "94",
     groupIds: "57,58",
     products: [
-      // {
-      //   id: "313",
-      //   name: "iPhone 17 Lavender 256GB",
-      //   url: "https://shop.unicornstore.in/type/iphone-17",
-      // },
-      // {
-      //   id: "311",
-      //   name: "iPhone 17 Sage 256GB",
-      //   url: "https://shop.unicornstore.in/type/iphone-17",
-      // },
-      // {
-      //   id: "312",
-      //   name: "iPhone 17 Mist Blue 256GB",
-      //   url: "https://shop.unicornstore.in/type/iphone-17",
-      // },
-      // {
-      //   id: "314",
-      //   name: "iPhone 17 White 256GB",
-      //   url: "https://shop.unicornstore.in/type/iphone-17",
-      // },
-      // {
-      //   id: "315",
-      //   name: "iPhone 17 Black 256GB",
-      //   url: "https://shop.unicornstore.in/type/iphone-17",
-      // },
+      {
+        id: "313",
+        name: "iPhone 17 Lavender 256GB",
+        url: "https://shop.unicornstore.in/type/iphone-17",
+      },
+      {
+        id: "311",
+        name: "iPhone 17 Sage 256GB",
+        url: "https://shop.unicornstore.in/type/iphone-17",
+      },
+      {
+        id: "312",
+        name: "iPhone 17 Mist Blue 256GB",
+        url: "https://shop.unicornstore.in/type/iphone-17",
+      },
+      {
+        id: "314",
+        name: "iPhone 17 White 256GB",
+        url: "https://shop.unicornstore.in/type/iphone-17",
+      },
+      {
+        id: "315",
+        name: "iPhone 17 Black 256GB",
+        url: "https://shop.unicornstore.in/type/iphone-17",
+      },
     ],
   },
   {

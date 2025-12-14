@@ -320,7 +320,7 @@ const applePickupCheck = async (productId, axios, retryCount = 0) => {
   }
 };
 
-// Custom request function for Flipkart (via proxy)
+// Custom request function for Flipkart (via proxy) - for individual product checks
 const flipkartCustomRequest = async ({ pincode, code, axios }) => {
   try {
     const proxyUrl =
@@ -345,6 +345,76 @@ const flipkartCustomRequest = async ({ pincode, code, axios }) => {
     if (err.response) {
       console.error("Response status:", err.response.status);
       console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request function for Flipkart search API (direct API call)
+const flipkartSearchCustomRequest = async ({ axios }) => {
+  try {
+    // Generate unique ssid and sqid (session IDs)
+    const ssid = `1hpd0b44kg${Date.now()}`;
+    const sqid = `${Math.random().toString(36).substring(2, 15)}${Date.now()}`;
+
+    const url = "https://1.rome.api.flipkart.com/api/4/page/fetch";
+    const payload = {
+      pageUri:
+        "/search?q=iphone%2017&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off",
+      pageContext: {
+        fetchSeoData: true,
+        paginatedFetch: false,
+        pageNumber: 1,
+      },
+      requestContext: {
+        type: "BROWSE_PAGE",
+        ssid: ssid,
+        sqid: sqid,
+      },
+    };
+
+    const headers = {
+      Accept: "*/*",
+      "Accept-Language": "en-US,en;q=0.8",
+      Connection: "keep-alive",
+      "Content-Type": "application/json",
+      Origin: "https://www.flipkart.com",
+      Referer: "https://www.flipkart.com/",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-site",
+      "Sec-GPC": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "X-User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 FKUA/website/42/website/Desktop",
+      "sec-ch-ua": '"Brave";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+    };
+
+    // Use cookie from env if available, otherwise use a default
+    const cookie = process.env.FLIPKART_COOKIE;
+    if (cookie) {
+      headers["Cookie"] = cookie;
+    }
+
+    const res = await axios.post(url, payload, {
+      headers: headers,
+      timeout: 30_000,
+    });
+    return res.data;
+  } catch (err) {
+    console.error("Flipkart Search API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      if (err.response.data) {
+        const dataStr =
+          typeof err.response.data === "string"
+            ? err.response.data.substring(0, 500)
+            : JSON.stringify(err.response.data).substring(0, 500);
+        console.error("Response data:", dataStr);
+      }
     }
     return null;
   }
@@ -862,6 +932,6 @@ attachCustomRequest("Amazon", amazonTwisterCustomRequest);
 // attachCustomRequest("Amazon", amazonCustomRequest); // PAAPI v5 - disabled
 
 // Export for use in index.js
-export { applePickupCheck };
+export { applePickupCheck, flipkartSearchCustomRequest };
 
 // Note: Apple uses separate applePickupCheck function, not attached here

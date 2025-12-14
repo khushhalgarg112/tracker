@@ -6,10 +6,12 @@ import axios from "axios";
 dotenv.config();
 
 import { PINCODES, PLATFORMS } from "./config.js";
+
 import {
   callStockAPI,
   attachCustomRequest,
   applePickupCheck,
+  flipkartSearchCustomRequest,
 } from "./services/apiClient.js";
 import {
   sendTelegram,
@@ -213,7 +215,7 @@ const getSamsungAvailabilityDetails = (code, resData) => {
   return availabilityDetails;
 };
 
-// Helper function to get Flipkart availability details
+// Helper function to get Flipkart availability details (for individual product API)
 const getFlipkartAvailabilityDetails = (code, resData) => {
   try {
     const response = resData.RESPONSE?.[code];
@@ -245,6 +247,204 @@ const getFlipkartAvailabilityDetails = (code, resData) => {
     console.error("Response data:", JSON.stringify(resData, null, 2));
     return null;
   }
+};
+
+// Helper function to parse Flipkart search response and extract iPhone 17 256GB products
+const parseFlipkartSearchResponse = (resData) => {
+  const products = [];
+
+  try {
+    if (!resData || !resData.RESPONSE || !resData.RESPONSE.pageData) {
+      console.log("[Flipkart Search] Invalid response structure");
+      return products;
+    }
+
+    // iPhone 17 256GB product mapping (id, name, url)
+    const iphone17Products = [
+      {
+        id: "MOBHFN6YKGBPYJZD",
+        name: "Apple iPhone 17 (Lavender, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-lavender-256-gb/p/itmf37c8dffa4165?pid=MOBHFN6YKGBPYJZD&lid=LSTMOBHFN6YKGBPYJZDEZPBYP&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_19&otracker=search&otracker1=search&fm=search-autosuggest&iid=83397663-01ea-4654-b405-c51c2dab4d99.MOBHFN6YKGBPYJZD.SEARCH&ppt=sp&ppn=sp&ssid=71742qm8680000001765375401829&qH=c9eeb2d6cc488f0b",
+      },
+      {
+        id: "MOBHFN6YN2HXB5HE",
+        name: "Apple iPhone 17 (Black, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd?pid=MOBHFN6YN2HXB5HE&lid=LSTMOBHFN6YN2HXB5HER9QXGU&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_14&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YN2HXB5HE.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b",
+      },
+      {
+        id: "MOBHFN6YTSH3QRCZ",
+        name: "Apple iPhone 17 (White, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-white-256-gb/p/itmf98e89534d806?pid=MOBHFN6YTSH3QRCZ&lid=LSTMOBHFN6YTSH3QRCZYMRV03&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_16&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YTSH3QRCZ.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b",
+      },
+      {
+        id: "MOBHFN6YNAG4ZTHS",
+        name: "Apple iPhone 17 (Sage, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-sage-256-gb/p/itmcfa57eff7729c?pid=MOBHFN6YNAG4ZTHS&lid=LSTMOBHFN6YNAG4ZTHSWUQQUI&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_17&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YNAG4ZTHS.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b",
+      },
+      {
+        id: "MOBHFN6YWTXZD8SG",
+        name: "Apple iPhone 17 (Mist Blue, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itm1834df7ee2812?pid=MOBHFN6YWTXZD8SG&lid=LSTMOBHFN6YWTXZD8SGROTZTS&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_18&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YWTXZD8SG.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b",
+      },
+    ];
+
+    // Create a map for quick lookup
+    const iphone17ProductMap = new Map(iphone17Products.map((p) => [p.id, p]));
+    const iphone17ProductIds = iphone17Products.map((p) => p.id);
+
+    console.log(
+      `[Flipkart Search] Tracking ${
+        iphone17ProductIds.length
+      } iPhone 17 256GB products: ${iphone17ProductIds.join(", ")}`
+    );
+    // Check both widgets and slots arrays (Flipkart may use either structure)
+    // Slots contain widgets, so we need to check both
+    let slots = resData.RESPONSE.slots || [];
+    console.log(
+      slots.length,
+      "-------------------------------------------------slots"
+    );
+    slots = slots.filter((slot) => slot?.widget);
+    console.log(
+      slots.length,
+      "-------------------------------------------------slots"
+    );
+
+    // Find ALL PRODUCT_SUMMARY widgets which contain product listings
+    let totalProductsChecked = 0;
+    const allProductsFound = []; // Track all products for logging
+
+    for (const slot of slots) {
+      if (slot.widget && slot.widget.type === "PRODUCT_SUMMARY") {
+        const widgetData = slot.widget.data;
+        if (
+          widgetData &&
+          widgetData.products &&
+          Array.isArray(widgetData.products)
+        ) {
+          console.log(
+            `[Flipkart Search] Processing widget with ${widgetData.products.length} products`
+          );
+          totalProductsChecked += widgetData.products.length;
+
+          for (const product of widgetData.products) {
+            if (product.productInfo && product.productInfo.value) {
+              const productValue = product.productInfo.value;
+
+              // Get productId from action.params.productId (primary) or value.id (fallback)
+              const productId =
+                product.addToWishlist.action?.params?.productId ||
+                productValue.id;
+
+              // Get title from titles object (preferred) or fallback to title field
+              const titles = productValue.titles || {};
+              const title =
+                titles.title || titles.newTitle || productValue.title || "";
+
+              const buyability = productValue.buyability || {};
+              const pricing = productValue.pricing || {};
+              const baseUrl = productValue.baseUrl || "";
+
+              // Log ALL products found
+              const isAvailable = buyability.intent === "positive";
+              const availabilityStatus = isAvailable
+                ? "✅ AVAILABLE"
+                : "❌ UNAVAILABLE";
+              const buyabilityMessage = buyability.message || "N/A";
+
+              console.log(
+                `[Flipkart Search] Product Found - ID: ${productId}, Title: ${title}, Status: ${availabilityStatus}, Message: ${buyabilityMessage}`
+              );
+
+              allProductsFound.push({
+                productId: productId,
+                title: title,
+                available: isAvailable,
+              });
+
+              // Check if this productId is in our tracking list (iPhone 17 256GB)
+              // Use productId matching instead of name matching for robustness
+              if (iphone17ProductIds.includes(productId)) {
+                const productInfo = iphone17ProductMap.get(productId);
+                console.log(
+                  `[Flipkart Search] ✅ MATCHED iPhone 17 256GB - ID: ${productId}, Title: ${title}, Available: ${isAvailable}`
+                );
+
+                const price =
+                  pricing.finalPrice?.decimalValue ||
+                  pricing.finalPrice?.value ||
+                  null;
+
+                // Use URL from mapping, fallback to constructed URL
+                const fullUrl =
+                  productInfo?.url ||
+                  (baseUrl.startsWith("http")
+                    ? baseUrl
+                    : `https://www.flipkart.com${baseUrl}`);
+
+                products.push({
+                  productId: productId,
+                  title: productInfo?.name || title, // Use name from mapping
+                  available: isAvailable,
+                  price: price,
+                  url: fullUrl,
+                  color: extractColorFromTitle(productInfo?.name || title),
+                  buyability: buyability, // Store buyability for reference
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    console.log(
+      `[Flipkart Search] Summary: Checked ${totalProductsChecked} total products, found ${allProductsFound.length} products, matched ${products.length} iPhone 17 256GB products`
+    );
+
+    // Log which tracked products were found and their status
+    console.log(`[Flipkart Search] Tracked Products Status:`);
+    for (const trackedId of iphone17ProductIds) {
+      const foundProduct = allProductsFound.find(
+        (p) => p.productId === trackedId
+      );
+      if (foundProduct) {
+        console.log(
+          `  ✅ ${trackedId} - ${foundProduct.title} - ${
+            foundProduct.available ? "AVAILABLE" : "UNAVAILABLE"
+          }`
+        );
+      } else {
+        console.log(`  ❌ ${trackedId} - NOT FOUND in search results`);
+      }
+    }
+  } catch (err) {
+    console.error("Error parsing Flipkart search response:", err.message);
+    console.error(err.stack);
+  }
+
+  return products;
+};
+
+// Helper function to extract color from product title
+const extractColorFromTitle = (title) => {
+  const colors = [
+    "Lavender",
+    "Black",
+    "White",
+    "Sage",
+    "Mist Blue",
+    "Deep Blue",
+    "Natural Titanium",
+  ];
+  const titleLower = title.toLowerCase();
+
+  for (const color of colors) {
+    if (titleLower.includes(color.toLowerCase())) {
+      return color;
+    }
+  }
+  return "Unknown";
 };
 
 // Helper function to get Reliance Digital availability details
@@ -637,6 +837,73 @@ const checkAppleStock = async () => {
   }
 };
 
+// Separate function to check Flipkart search for iPhone 17 256GB
+const checkFlipkartSearch = async () => {
+  try {
+    console.log("[Flipkart Search] Checking iPhone 17 256GB stock...");
+
+    const searchData = await flipkartSearchCustomRequest({ axios });
+
+    if (!searchData) {
+      console.log("[Flipkart Search] No data received from API");
+      return;
+    }
+
+    const products = parseFlipkartSearchResponse(searchData);
+    console.log(
+      `[Flipkart Search] Found ${products.length} iPhone 17 256GB products`
+    );
+
+    for (const product of products) {
+      if (product.available) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+        const timeStr = now.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        });
+
+        let text = `🎉 *iPhone 17 256GB STOCK AVAILABLE!* 🎉\n\n`;
+        text += `📱 ${product.title}\n`;
+        text += `🎨 Color: ${product.color}\n`;
+        text += `💾 Storage: 256 GB\n`;
+
+        if (product.price) {
+          const priceNum = parseFloat(product.price);
+          text += `💰 Price: ₹${priceNum.toLocaleString("en-IN")}\n`;
+        }
+
+        // Add buyability message if available (for additional context)
+        if (product.buyability && product.buyability.message) {
+          text += `\n📝 Status: ${product.buyability.message}\n`;
+        }
+
+        text += `\n🔗 [Buy Now](${product.url})\n\n`;
+        text += `⏰ ${dateStr}, ${timeStr}\n\n`;
+        text += `🏃‍♂️ Hurry! Stock may be limited!`;
+
+        console.log(
+          `ALERT -> Flipkart Search: ${product.productId} - ${product.title}`
+        );
+        await sendTelegram(text);
+        await sleep(500); // Small delay between alerts
+      } else {
+        console.log(
+          `[Flipkart Search] No stock: ${product.productId} - ${product.title}`
+        );
+      }
+    }
+  } catch (err) {
+    console.error("Error checking Flipkart search:", err.message);
+  }
+};
+
 // Separate function to check platforms without pincode (iQOO, Vivo, Unicorn, OPPO, Amazon)
 const checkPlatformsWithoutPincode = async () => {
   const platformsWithoutPincode = ["iQOO", "Vivo", "Unicorn", "OPPO", "Amazon"];
@@ -785,6 +1052,9 @@ const checkStock = async () => {
 
   // Check Apple separately (no pincode iteration) - DISABLED
   // await checkAppleStock();
+
+  // Check Flipkart search for iPhone 17 256GB
+  await checkFlipkartSearch();
 
   // Check platforms without pincode (iQOO, Vivo, Unicorn) - Amazon disabled
   await checkPlatformsWithoutPincode();

@@ -842,7 +842,7 @@ const checkFlipkartSearch = async () => {
   try {
     console.log("[Flipkart Search] Checking iPhone 17 256GB stock...");
 
-    const searchData = await flipkartSearchCustomRequest({ axios });
+    // const searchData = await flipkartSearchCustomRequest({ axios });
 
     if (!searchData) {
       console.log("[Flipkart Search] No data received from API");
@@ -1054,7 +1054,7 @@ const checkStock = async () => {
   // await checkAppleStock();
 
   // Check Flipkart search for iPhone 17 256GB
-  await checkFlipkartSearch();
+  // await checkFlipkartSearch();
 
   // Check platforms without pincode (iQOO, Vivo, Unicorn) - Amazon disabled
   await checkPlatformsWithoutPincode();

@@ -244,26 +244,26 @@ export const PLATFORMS = [
     pincodes: [], // No pincode needed for Amazon
     parentAsin: "B0DS5YTRZ3", // Parent ASIN for iPhone variants
     products: [
-      {
-        id: "B0FQF9ZY2X",
-        name: "iPhone 17 Blue",
-        url: "https://www.amazon.in/dp/B0FQF9ZY2X",
-      },
-      {
-        id: "B0FQFLQ2CQ",
-        name: "iPhone 17 Blue",
-        url: "https://www.amazon.in/dp/B0FQFLQ2CQ",
-      },
-      {
-        id: "B0FQFLZNKL",
-        name: "iPhone 17 Green",
-        url: "https://www.amazon.in/dp/B0FQFLZNKL",
-      },
-      {
-        id: "B0FQFYXCC4",
-        name: "iPhone 17 Black",
-        url: "https://www.amazon.in/dp/B0FQFYXCC4",
-      },
+      // {
+      //   id: "B0FQF9ZY2X",
+      //   name: "iPhone 17 Blue",
+      //   url: "https://www.amazon.in/dp/B0FQF9ZY2X",
+      // },
+      // {
+      //   id: "B0FQFLQ2CQ",
+      //   name: "iPhone 17 Blue",
+      //   url: "https://www.amazon.in/dp/B0FQFLQ2CQ",
+      // },
+      // {
+      //   id: "B0FQFLZNKL",
+      //   name: "iPhone 17 Green",
+      //   url: "https://www.amazon.in/dp/B0FQFLZNKL",
+      // },
+      // {
+      //   id: "B0FQFYXCC4",
+      //   name: "iPhone 17 Black",
+      //   url: "https://www.amazon.in/dp/B0FQFYXCC4",
+      // },
       // {
       //   id: "B0CHX1W1XY",
       //   name: "iPhone 15 Black",

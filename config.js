@@ -146,20 +146,20 @@ export const PLATFORMS = [
     //   { id: "MG8J4HN/A", name: "iPhone 17 Pro 256GB Deep Blue" },
     // ],
   },
-  {
-    name: "Flipkart",
-    apiUrl: "https://rknldeals.alwaysdata.net/flipkart_check",
-    method: "POST",
-    apiKey: null,
-    pincodes: ["122001"], // Multiple pincodes for Flipkart
-    products: [
-      // { id: "MOBHFN6YKGBPYJZD", name: "Apple iPhone 17 (Lavender, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-lavender-256-gb/p/itmf37c8dffa4165?pid=MOBHFN6YKGBPYJZD&lid=LSTMOBHFN6YKGBPYJZDEZPBYP&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_19&otracker=search&otracker1=search&fm=search-autosuggest&iid=83397663-01ea-4654-b405-c51c2dab4d99.MOBHFN6YKGBPYJZD.SEARCH&ppt=sp&ppn=sp&ssid=71742qm8680000001765375401829&qH=c9eeb2d6cc488f0b" },
-      // { id: "MOBHFN6YN2HXB5HE", name: "Apple iPhone 17 (Black, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd?pid=MOBHFN6YN2HXB5HE&lid=LSTMOBHFN6YN2HXB5HER9QXGU&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_14&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YN2HXB5HE.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b" },
-      // { id: "MOBHFN6YTSH3QRCZ", name: "Apple iPhone 17 (White, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-white-256-gb/p/itmf98e89534d806?pid=MOBHFN6YTSH3QRCZ&lid=LSTMOBHFN6YTSH3QRCZYMRV03&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_16&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YTSH3QRCZ.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b" },
-      // { id: "MOBHFN6YNAG4ZTHS", name: "Apple iPhone 17 (Sage, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-sage-256-gb/p/itmcfa57eff7729c?pid=MOBHFN6YNAG4ZTHS&lid=LSTMOBHFN6YNAG4ZTHSWUQQUI&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_17&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YNAG4ZTHS.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b" },
-      // { id: "MOBHFN6YWTXZD8SG", name: "Apple iPhone 17 (Mist Blue, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itm1834df7ee2812?pid=MOBHFN6YWTXZD8SG&lid=LSTMOBHFN6YWTXZD8SGROTZTS&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_18&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YWTXZD8SG.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b" }
-    ],
-  },
+  // {
+  //   name: "Flipkart",
+  //   apiUrl: "https://rknldeals.alwaysdata.net/flipkart_check",
+  //   method: "POST",
+  //   apiKey: null,
+  //   pincodes: ["122001"], // Multiple pincodes for Flipkart
+  //   products: [
+  //     { id: "MOBHFN6YKGBPYJZD", name: "Apple iPhone 17 (Lavender, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-lavender-256-gb/p/itmf37c8dffa4165?pid=MOBHFN6YKGBPYJZD&lid=LSTMOBHFN6YKGBPYJZDEZPBYP&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_19&otracker=search&otracker1=search&fm=search-autosuggest&iid=83397663-01ea-4654-b405-c51c2dab4d99.MOBHFN6YKGBPYJZD.SEARCH&ppt=sp&ppn=sp&ssid=71742qm8680000001765375401829&qH=c9eeb2d6cc488f0b" },
+  //     { id: "MOBHFN6YN2HXB5HE", name: "Apple iPhone 17 (Black, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd?pid=MOBHFN6YN2HXB5HE&lid=LSTMOBHFN6YN2HXB5HER9QXGU&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_14&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YN2HXB5HE.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b" },
+  //     { id: "MOBHFN6YTSH3QRCZ", name: "Apple iPhone 17 (White, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-white-256-gb/p/itmf98e89534d806?pid=MOBHFN6YTSH3QRCZ&lid=LSTMOBHFN6YTSH3QRCZYMRV03&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_16&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YTSH3QRCZ.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b" },
+  //     { id: "MOBHFN6YNAG4ZTHS", name: "Apple iPhone 17 (Sage, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-sage-256-gb/p/itmcfa57eff7729c?pid=MOBHFN6YNAG4ZTHS&lid=LSTMOBHFN6YNAG4ZTHSWUQQUI&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_17&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YNAG4ZTHS.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b" },
+  //     { id: "MOBHFN6YWTXZD8SG", name: "Apple iPhone 17 (Mist Blue, 256 GB)", url: "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itm1834df7ee2812?pid=MOBHFN6YWTXZD8SG&lid=LSTMOBHFN6YWTXZD8SGROTZTS&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_18&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YWTXZD8SG.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b" }
+  //   ],
+  // },
   {
     name: "Reliance Digital",
     apiUrl:

@@ -320,40 +320,12 @@ const applePickupCheck = async (productId, axios, retryCount = 0) => {
   }
 };
 
-// Custom request function for Flipkart (via proxy) - for individual product checks
-const flipkartCustomRequest = async ({ pincode, code, axios }) => {
-  try {
-    const proxyUrl =
-      process.env.FLIPKART_PROXY_URL ||
-      "https://rknldeals.alwaysdata.net/flipkart_check";
-    const res = await axios.post(
-      proxyUrl,
-      {
-        productId: code,
-        pincode: pincode,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        timeout: 25_000,
-      }
-    );
-    return res.data;
-  } catch (err) {
-    console.error("Flipkart API error:", err.message);
-    if (err.response) {
-      console.error("Response status:", err.response.status);
-      console.error("Response data:", err.response.data);
-    }
-    return null;
-  }
-};
-
 // Custom request function for Flipkart search API (direct API call)
 const flipkartSearchCustomRequest = async ({ axios }) => {
   try {
-    // Generate unique ssid and sqid (session IDs)
+    // Generate unique
+    // ssid and sqid (session IDs)
+    console.log("Generating flipkart alert");
     const ssid = `1hpd0b44kg${Date.now()}`;
     const sqid = `${Math.random().toString(36).substring(2, 15)}${Date.now()}`;
 
@@ -920,7 +892,7 @@ const amazonTwisterCustomRequest = async ({ code, axios, retryCount = 0 }) => {
 // Initialize custom requests
 attachCustomRequest("Croma", cromaCustomRequest);
 attachCustomRequest("Samsung", samsungCustomRequest);
-attachCustomRequest("Flipkart", flipkartCustomRequest);
+attachCustomRequest("Flipkart", flipkartSearchCustomRequest);
 attachCustomRequest("Reliance Digital", relianceDigitalCustomRequest);
 attachCustomRequest("iQOO", iqooCustomRequest);
 attachCustomRequest("Vivo", vivoCustomRequest);

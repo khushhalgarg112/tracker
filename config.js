@@ -217,11 +217,11 @@ export const PLATFORMS = [
         name: "Iqoo Neo 10R ",
         url: "https://shop.iqoo.com/in/product/2057?cid=noPreload&_gl=1%2ah7x205%2a_ga%2aMTUwMjg5MDA5MC4xNzYzMjgzNDUw%2a_ga_JX6ZMMBG2R%2aczE3NjMyODM0NDkkbzEkZzEkdDE3NjMyODM1MTgkajUyJGwwJGgw",
       },
-      {
-        id: "2063",
-        name: "Iqoo Neo 10",
-        url: "https://shop.iqoo.com/in/product/2063?skuId=8375",
-      },
+      // {
+      //   id: "2063",
+      //   name: "Iqoo Neo 10",
+      //   url: "https://shop.iqoo.com/in/product/2063?skuId=8375",
+      // },
     ],
   },
   {
@@ -232,7 +232,12 @@ export const PLATFORMS = [
     pincodes: [], // No pincode needed for Vivo
     products: [
       //  { id: "10297", name: "X200 12GB+256GB Natural Green", url: "https://shop.vivo.com/in/product/10297?utm_source=website&utm_medium=mainbanner&utm_campaign=x200launch&cid=noPreload&_ga=2.163479356.1656843844.1763283692-1348449134.1763283692&_gl=1%2aloo18t%2a_ga%2aMTM0ODQ0OTEzNC4xNzYzMjgzNjky%2a_ga_68BLCXM546%2aczE3NjMyODM2OTIkbzEkZzEkdDE3NjMyODM2OTYkajU2JGwwJGgw" },
-      //  { id: "10320", name: "V60 8GB+128GB Mist Gray", url: "https://shop.vivo.com/in/product/10320?utm_source=website%20&utm_medium=mainbanner&utm_campaign=vivo_v60"}
+      //  { id: "10320", name: "V60 8GB+128GB Mist Gray", url: "https://shop.vivo.com/in/product/10320?utm_source=website%20&utm_medium=mainbanner&utm_campaign=vivo_v60"},
+      // {
+      //   id: "10318",
+      //   name: "T4R",
+      //   url: "https://shop.vivo.com/in/product/10318?skuId=19219",
+      // },
     ],
   },
   {

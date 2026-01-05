@@ -227,11 +227,11 @@ export const PLATFORMS = [
     apiKey: null,
     pincodes: ["122001", "485001"],
     products: [
-      {
-        id: "2057",
-        name: "Iqoo Neo 10R ",
-        url: "https://shop.iqoo.com/in/product/2057?cid=noPreload&_gl=1%2ah7x205%2a_ga%2aMTUwMjg5MDA5MC4xNzYzMjgzNDUw%2a_ga_JX6ZMMBG2R%2aczE3NjMyODM0NDkkbzEkZzEkdDE3NjMyODM1MTgkajUyJGwwJGgw",
-      },
+      // {
+      //   id: "2057",
+      //   name: "Iqoo Neo 10R ",
+      //   url: "https://shop.iqoo.com/in/product/2057?cid=noPreload&_gl=1%2ah7x205%2a_ga%2aMTUwMjg5MDA5MC4xNzYzMjgzNDUw%2a_ga_JX6ZMMBG2R%2aczE3NjMyODM0NDkkbzEkZzEkdDE3NjMyODM1MTgkajUyJGwwJGgw",
+      // },
       // {
       //   id: "2063",
       //   name: "Iqoo Neo 10",
@@ -248,11 +248,11 @@ export const PLATFORMS = [
     products: [
       //  { id: "10297", name: "X200 12GB+256GB Natural Green", url: "https://shop.vivo.com/in/product/10297?utm_source=website&utm_medium=mainbanner&utm_campaign=x200launch&cid=noPreload&_ga=2.163479356.1656843844.1763283692-1348449134.1763283692&_gl=1%2aloo18t%2a_ga%2aMTM0ODQ0OTEzNC4xNzYzMjgzNjky%2a_ga_68BLCXM546%2aczE3NjMyODM2OTIkbzEkZzEkdDE3NjMyODM2OTYkajU2JGwwJGgw" },
       //  { id: "10320", name: "V60 8GB+128GB Mist Gray", url: "https://shop.vivo.com/in/product/10320?utm_source=website%20&utm_medium=mainbanner&utm_campaign=vivo_v60"},
-      // {
-      //   id: "10318",
-      //   name: "T4R",
-      //   url: "https://shop.vivo.com/in/product/10318?skuId=19219",
-      // },
+      {
+        id: "10321",
+        name: "T4 Pro",
+        url: "https://mshop.vivo.com/in/product/10321?skuId=19266&utm_source=exspace&utm_medium=search&utm_campaign=searchResult&utm_term=slot0&utm_content=T4%20Pro%09%09&cid=exspace_search_searchResult_slot0_T4%20Pro%09%09",
+      },
     ],
   },
   {

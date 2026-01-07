@@ -203,21 +203,21 @@ export const PLATFORMS = [
         name: "Apple iPhone 15 Plus 128 GB, Green",
         url: "https://www.reliancedigital.in/product/apple-iphone-15-plus-128-gb-green-lmj3id-7533828?internal_source=search_results",
       },
-      {
-        id: "494494547",
-        name: "Pixel 9A Obsidian",
-        url: "https://www.reliancedigital.in/product/google-pixel-9a-256-gb-8-gb-ram-porcelain-mobile-phone-m8d2i9-8977955?internal_source=search_results",
-      },
-      {
-        id: "494494549",
-        name: "Pixel 9A Iris",
-        url: "https://www.reliancedigital.in/product/google-pixel-9a-256-gb-8-gb-ram-iris-mobile-phone-m8d2id-8977957?internal_source=search_results",
-      },
-      {
-        id: "494494548",
-        name: "Pixel 9A  Porcelain",
-        url: "https://www.reliancedigital.in/product/google-pixel-9a-256-gb-8-gb-ram-porcelain-mobile-phone-m8d2i9-8977955?internal_source=search_results",
-      },
+      // {
+      //   id: "494494547",
+      //   name: "Pixel 9A Obsidian",
+      //   url: "https://www.reliancedigital.in/product/google-pixel-9a-256-gb-8-gb-ram-porcelain-mobile-phone-m8d2i9-8977955?internal_source=search_results",
+      // },
+      // {
+      //   id: "494494549",
+      //   name: "Pixel 9A Iris",
+      //   url: "https://www.reliancedigital.in/product/google-pixel-9a-256-gb-8-gb-ram-iris-mobile-phone-m8d2id-8977957?internal_source=search_results",
+      // },
+      // {
+      //   id: "494494548",
+      //   name: "Pixel 9A  Porcelain",
+      //   url: "https://www.reliancedigital.in/product/google-pixel-9a-256-gb-8-gb-ram-porcelain-mobile-phone-m8d2i9-8977955?internal_source=search_results",
+      // },
     ],
   },
   {

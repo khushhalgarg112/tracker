@@ -8,13 +8,24 @@ This project polls multiple e-commerce platform APIs every 5 minutes for stock a
 
 2. `npm install`
 
-3. Create `.env` from `.env.example` and add your Telegram bot token and chat id
+3. Create `.env` (see `.env.example`) and add your Telegram bot token and chat id
 
 4. Edit `config.js` to add your platforms and product codes
 
 5. (Optional) Add proxy configuration to `.env` for Apple API to avoid rate limiting
 
 6. Run `npm start`
+
+## BigBasket search tracking
+
+The bot can call the same BigBasket listing API as the provided cURL to watch multiple pages (e.g., pages 1‑4 for `iphone 17`, `iphone 16`, `iphone 15`) and alert when Apple products come back in stock with an offer badge/bank offer.
+
+1. Add `BIGBASKET_COOKIE` to `.env` with a fresh cookie string captured from your browser (DevTools → Network → listing request → Request Headers → Cookie).
+2. (Optional) Override headers via `BIGBASKET_TRACKER_ID`, `BIGBASKET_USER_AGENT`, or `BIGBASKET_ACCEPT_LANGUAGE`.
+3. Set `QUICK_COMMERCE_BOT` and `QUICK_COMMERCE_ID` in `.env` if you want these alerts delivered through a dedicated Telegram bot/channel (BigBasket alerts default to this sender).
+4. Edit `BIGBASKET_TRACKERS` in `config.js` to control the shared `iphone` search slug, pages (1‑4 by default), brand whitelist, `categoryWhitelist` (defaults to smartphones), and the `products` array. Each `products` entry defines a canonical name and optional `matchers` array (treated as whole-word regexes, e.g., “iPhone 17”)—only rows whose description matches one of those terms and show as in-stock + offer trigger an alert.
+
+During each sweep, the watcher fetches every configured page, filters by the brand whitelist (default Apple), skips sold-out rows, and sends a Telegram message summarising the effective price, discount text, and bank offer for each in-stock product it finds.
 
 ## Proxy Configuration (Optional)
 

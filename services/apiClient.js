@@ -77,11 +77,37 @@ export const callStockAPI = async (platform, pincode, code) => {
   }
 };
 
-// Custom request function for Croma - SIMPLIFIED (based on working Python code)
-const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
+// Custom request function for Croma - FIXED with all required headers
+const cromaCustomRequest = async ({ pincode, code, axios, retryCount = 0 }) => {
   // Ensure pincode is a string (Python passes it as string)
   const pincodeStr = String(pincode);
   const maxRetries = 2;
+
+  // Get Croma platform config to use ALL headers (required to bypass Akamai WAF)
+  const cromaPlatform = PLATFORMS.find((p) => p.name === "Croma");
+  const headers = cromaPlatform?.headers || {
+    accept: "application/json, text/plain, */*",
+    "accept-language": "en-US,en;q=0.9",
+    accesstoken: "2fe360a8-442f-4881-9b30-451c1643c339",
+    client_id: "CROMA-WEB-APP",
+    "content-type": "application/json",
+    csc_code: "null",
+    customerhash: "3256e9210dc30c675fefe93551b083e3",
+    "oms-apim-subscription-key": "1131858141634e2abe2efb2b3a2a2a5d",
+    origin: "https://www.croma.com",
+    priority: "u=1, i",
+    referer: "https://www.croma.com/",
+    "sec-ch-ua": '"Chromium";v="142", "Brave";v="142", "Not_A Brand";v="99"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-site",
+    "sec-gpc": "1",
+    source: "null",
+    "user-agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+  };
 
   const requestBody = {
     promise: {
@@ -93,7 +119,7 @@ const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
         promiseLine: [
           {
             fulfillmentType: "HDEL",
-            itemID: String(code), // Ensure code is string
+            itemID: String(code),
             lineId: "1",
             requiredQty: "1",
             shipToAddress: {
@@ -113,21 +139,15 @@ const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
       "https://api.croma.com/inventory/oms/v2/tms/details-pwa/",
       requestBody,
       {
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          "oms-apim-subscription-key": "1131858141634e2abe2efb2b3a2a2a5d",
-          origin: "https://www.croma.com",
-          referer: "https://www.croma.com/",
-        },
+        headers: headers,
         timeout: 10_000,
       }
     );
     return res.data;
   } catch (err) {
     console.error(
-      `Croma API error for product ${code}, pincode ${pincode}:`,
-      err
+      `[Croma] API error for product ${code}, pincode ${pincode}:`,
+      err.message
     );
 
     if (
@@ -135,9 +155,10 @@ const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
       err.response.status === 403 &&
       retryCount < maxRetries
     ) {
-      const delay = (retryCount + 1) * 2000; // 5s, 10s delays
+      const delay = (retryCount + 1) * 2000;
+      // FIX: Use backticks for template literal
       console.log(
-        "Croma rate limited (403) for product ${code}, retrying after ${delay}ms..."
+        `[Croma] Rate limited (403) for product ${code}, retrying after ${delay}ms...`
       );
       await new Promise((resolve) => setTimeout(resolve, delay));
       return cromaCustomRequest({
@@ -149,16 +170,27 @@ const cromaCustomRequest = async ({ pincode, code, axio, retryCount = 0 }) => {
     }
 
     if (err.response) {
-      console.error("Response status:", err.response.status);
-      console.error("Response headers:", err.response.headers);
+      console.error(`[Croma] Response status: ${err.response.status}`);
       if (err.response.data) {
-        console.error(
-          "Response data:",
-          JSON.stringify(err.response.data, null, 2)
-        );
+        // Check if it's an Akamai block
+        const responseText =
+          typeof err.response.data === "string"
+            ? err.response.data
+            : JSON.stringify(err.response.data);
+        if (
+          responseText.includes("Access Denied") ||
+          responseText.includes("edgesuite.net")
+        ) {
+          console.error(
+            `[Croma] ⚠️ BLOCKED BY AKAMAI WAF - Missing browser headers or IP flagged`
+          );
+        }
+        console.error("Response data:", responseText.substring(0, 500));
       }
     } else if (err.request) {
-      console.error("Request made but no response received:", err.request);
+      console.error(
+        `[Croma] Network error - no response received. Code: ${err.code}`
+      );
     }
     return null;
   }
@@ -288,31 +320,73 @@ const applePickupCheck = async (productId, axios, retryCount = 0) => {
   }
 };
 
-// Custom request function for Flipkart (via proxy)
-const flipkartCustomRequest = async ({ pincode, code, axios }) => {
+// Custom request function for Flipkart search API (direct API call)
+const flipkartSearchCustomRequest = async ({ axios }) => {
   try {
-    const proxyUrl =
-      process.env.FLIPKART_PROXY_URL ||
-      "https://rknldeals.alwaysdata.net/flipkart_check";
-    const res = await axios.post(
-      proxyUrl,
-      {
-        productId: code,
-        pincode: pincode,
+    // Generate unique
+    // ssid and sqid (session IDs)
+    console.log("Generating flipkart alert");
+    const ssid = `1hpd0b44kg${Date.now()}`;
+    const sqid = `${Math.random().toString(36).substring(2, 15)}${Date.now()}`;
+
+    const url = "https://1.rome.api.flipkart.com/api/4/page/fetch";
+    const payload = {
+      pageUri:
+        "/search?q=iphone%2017&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off",
+      pageContext: {
+        fetchSeoData: true,
+        paginatedFetch: false,
+        pageNumber: 1,
       },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        timeout: 25_000,
-      }
-    );
+      requestContext: {
+        type: "BROWSE_PAGE",
+        ssid: ssid,
+        sqid: sqid,
+      },
+    };
+
+    const headers = {
+      Accept: "*/*",
+      "Accept-Language": "en-US,en;q=0.8",
+      Connection: "keep-alive",
+      "Content-Type": "application/json",
+      Origin: "https://www.flipkart.com",
+      Referer: "https://www.flipkart.com/",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-site",
+      "Sec-GPC": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "X-User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 FKUA/website/42/website/Desktop",
+      "sec-ch-ua": '"Brave";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+    };
+
+    // Use cookie from env if available, otherwise use a default
+    const cookie = process.env.FLIPKART_COOKIE;
+    if (cookie) {
+      headers["Cookie"] = cookie;
+    }
+
+    const res = await axios.post(url, payload, {
+      headers: headers,
+      timeout: 30_000,
+    });
     return res.data;
   } catch (err) {
-    console.error("Flipkart API error:", err.message);
+    console.error("Flipkart Search API error:", err.message);
     if (err.response) {
       console.error("Response status:", err.response.status);
-      console.error("Response data:", err.response.data);
+      if (err.response.data) {
+        const dataStr =
+          typeof err.response.data === "string"
+            ? err.response.data.substring(0, 500)
+            : JSON.stringify(err.response.data).substring(0, 500);
+        console.error("Response data:", dataStr);
+      }
     }
     return null;
   }
@@ -408,7 +482,196 @@ const vivoCustomRequest = async ({ code, axios }) => {
   }
 };
 
-// Custom request function for Amazon PAAPI v5 (no pincode)
+// Custom request function for Unicorn (no pincode)
+const unicornCustomRequest = async ({ code, axios }) => {
+  try {
+    const unicornPlatform = PLATFORMS.find((p) => p.name === "Unicorn") || {};
+    const storageOptionId = unicornPlatform.storageOptionId || "250";
+    const categoryId = unicornPlatform.categoryId || "456";
+    const familyId = unicornPlatform.familyId || "94";
+    const groupIds = unicornPlatform.groupIds || "57,58";
+
+    const payload = {
+      category_id: categoryId,
+      family_id: familyId,
+      group_ids: groupIds,
+      option_ids: `${code},${storageOptionId}`,
+    };
+
+    const res = await axios.post(
+      unicornPlatform.apiUrl ||
+        "https://fe01.beamcommerce.in/get_product_by_option_id",
+      payload,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "content-type": "application/json",
+          "customer-id": "unicorn",
+          origin: "https://shop.unicornstore.in",
+          referer: "https://shop.unicornstore.in/",
+        },
+        timeout: 10_000,
+      }
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Unicorn API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request for Vijay Sales (requires pincode)
+const vijaySalesCustomRequest = async ({ pincode, code, axios }) => {
+  try {
+    const params = new URLSearchParams({
+      pincode: String(pincode),
+      vanNo: String(code),
+      storeList: "true",
+    });
+
+    const url = `https://mdm.vijaysales.com/web/api/oms/check-servicibility/v1?${params.toString()}`;
+    const res = await axios.get(url, {
+      headers: {
+        accept: "*/*",
+        origin: "https://www.vijaysales.com",
+        referer: "https://www.vijaysales.com/",
+        "user-agent":
+          "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142 Mobile Safari/537.36",
+      },
+      timeout: 10_000,
+    });
+    return res.data;
+  } catch (err) {
+    console.error("Vijay Sales API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request for Sangeetha (requires pincode)
+const sangeethaCustomRequest = async ({ pincode, code, axios }) => {
+  try {
+    const payload = {
+      type: "desktop",
+      product_id: String(code),
+      pinCode: String(pincode),
+      user_id: "",
+    };
+
+    const res = await axios.post(
+      "https://www.sangeethamobiles.com/b/customer/api/v3/product-eta-details",
+      payload,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "accept-language": "en-US,en;q=0.8",
+          "content-type": "application/json",
+          cookie:
+            "__guest_fingerprint=28f9d9cf-de81-4f9e-eeb7-dd53f9528763; superauserwooblyads=d148f391-22be-4a77-ba7d-655991564335; cookieAllowed=accepted; ph_phc_5gTb5cKyB4bpGngoJtohVMdhYYJ9lyNEm8vJFXCkaH7_posthog=%7B%22distinct_id%22%3A%22019aa783-9d53-787d-b8e7-cec52f39f0d4%22%2C%22%24sesid%22%3A%5B1763805489694%2C%22019aaaff-da4d-737e-b15e-565537877f68%22%2C1763805485643%5D%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22https%3A%2F%2Fsearch.brave.com%2F%22%2C%22u%22%3A%22https%3A%2F%2Fwww.sangeethamobiles.com%2F%22%7D%7D; sanUserCode=2820840e-9685-67c6-916d-d27d36d4cd6f-1763901686830; AWSALB=jLnTuztiDAAt5XhfqxfQ2dIuqA+ZvciW/FtSLeq2igOqt1CrUe1H/7PfApVQAlZQPsjFUp9916mwvzk6yyCXNHgpjjFFSFIdhLHRoVEdO74YHh9yrsgRUKtnI3q5; AWSALBCORS=jLnTuztiDAAt5XhfqxfQ2dIuqA+ZvciW/FtSLeq2igOqt1CrUe1H/7PfApVQAlZQPsjFUp9916mwvzk6yyCXNHgpjjFFSFIdhLHRoVEdO74YHh9yrsgRUKtnI3q5",
+          number1:
+            "18j3bX3AFk4trD#2icbB6ak3H@&OK1L0geZ0Nry5Y$o1EVa^F1k1$GZ6&QwK",
+          number2:
+            "9bcFbw29SimO6v0ArwLw$9)N5U9G3NQOHadxL6fFvA8bDYbYw7tmX#Ia6VFD5Wk3lz&6yNNt",
+          origin: "https://www.sangeethamobiles.com",
+          priority: "u=1, i",
+          referer: `https://www.sangeethamobiles.com/product-details/apple-iphone-17-512gb-white-apple-iphone-17-512gb-white/${code}`,
+          "sec-ch-ua":
+            '"Chromium";v="142", "Brave";v="142", "Not_A Brand";v="99"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          "sec-gpc": "1",
+          "user-agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+        },
+        timeout: 15_000,
+      }
+    );
+    return res.data;
+  } catch (err) {
+    // Handle 500 errors gracefully
+    if (err.response && err.response.status === 500) {
+      console.error(
+        `[Sangeetha] Server error (500) for product ${code}, pincode ${pincode}`
+      );
+      // Return a structured error response similar to check_sangeetha_store pattern
+      return {
+        error: true,
+        status: 500,
+        message: "Server error - API returned 500",
+        total: 0,
+        found: 0,
+      };
+    }
+
+    console.error(
+      `[Sangeetha] API error for product ${code}, pincode ${pincode}:`,
+      err.message
+    );
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request function for OPPO (no pincode)
+const oppoCustomRequest = async ({ code, axios }) => {
+  try {
+    const url =
+      "https://opsg-gateway-in.oppo.com/v2/api/rest/mall/product/detail/fetch";
+    const payload = {
+      productCode: String(code),
+      userGroupName: "",
+      storeViewCode: "in",
+      configModule: 3,
+      settleChannel: 3,
+    };
+
+    const res = await axios.post(url, payload, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "accept-language": "en-US,en;q=0.7",
+        "content-type": "application/json",
+        origin: "https://www.oppo.com",
+        priority: "u=1, i",
+        referer: "https://www.oppo.com/",
+        "sec-ch-ua":
+          '"Chromium";v="142", "Brave";v="142", "Not_A Brand";v="99"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "sec-gpc": "1",
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+        Cookie: "frontend=3c8c9e4681264ff0a56b9b02850e200a",
+      },
+      timeout: 10_000,
+    });
+    return res.data;
+  } catch (err) {
+    console.error("OPPO API error:", err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    return null;
+  }
+};
+
+// Custom request function for Amazon PAAPI v5 (no pincode) - DISABLED
 const amazonCustomRequest = async ({ code, axios }) => {
   const crypto = await import("crypto");
   const hmac = crypto.createHmac;
@@ -501,16 +764,146 @@ const amazonCustomRequest = async ({ code, axios }) => {
   }
 };
 
+// Custom request function for Amazon Twister API (no pincode)
+// Uses the twisterDimensionSlotsDefault endpoint to check availability
+const amazonTwisterCustomRequest = async ({ code, axios, retryCount = 0 }) => {
+  const maxRetries = 3;
+  const baseDelay = 2000; // 2 seconds base delay
+
+  try {
+    // Get Amazon platform config for additional params if needed
+    const amazonPlatform = PLATFORMS.find((p) => p.name === "Amazon") || {};
+    const parentAsin = amazonPlatform.parentAsin || "B0DS5YTRZ3"; // Default parent ASIN from curl
+    const qid = Math.floor(Date.now() / 1000); // Generate current timestamp as qid
+
+    // Get cookie from env var or use default (allows cookie rotation)
+    const amazonCookie =
+      process.env.AMAZON_COOKIE ||
+      'session-id=260-1126426-7541216; i18n-prefs=INR; lc-acbin=en_IN; ubid-acbin=261-4435401-2469803; csm-sid=657-5481649-7174659; sso-state-acbin=Xdsso|ZQGXvf3m_CjavT-DUC_LyDWx89HgoJSGPf31NViQmQXTdTfDK2kemfNlto5stNortNt9LhA5q4TCMlYnWUOwKBvP7rg0BF3sCwfalc_h_26Im53p; at-acbin=Atza|gQCO02jZAwEBArKcU3CC0fy156IZcSEYZ5i7HkrMuJpJ1jVhzJtZboLLTYZwb-7Ik5RvVhzPKl-BR1vlmlLxr24T3ry8X-Pn7YcxpCS3uTIoV8HXaJ303UpusQ0B5rkCr18NUBDHa08Twngcvb-fgmqMo3uDExbMy4ADpfD3mpFb-lZYJJ_63IeR4HgyjKAXKRxqG9N7aRwxlP2cySccRCD0KetYJq7UYbhjCPSbLEqoxUBKIVC2cKHxsViKUTc6_jNSRpKCpT_YXsz_9cjB4Zb3y-OQzWCiRNjQsDyppzJ8WMRW-Fd8YWdOTt1lJj2QBlH3bD2bO39xom4bn_sva3JAdp5JOXYl-VRpPAWSqAYZWD4jBCmANk9BE47OgrFceSxG6ZoyDGni29akFSyvCOGtDjXf0WseYrFvIGKQOmKVbg; sess-at-acbin=X/gkVPgZp074VrtgNFY4Omhh/x5BUjFMZikV54Wt6h8=; sst-acbin=Sst1|PQHHwQYnaSMkqc3oQiCykpDwCTIcQVx3X7CH-C7N-zzOi4gb8qrr5HjyFNQnjdexxSehFybmjI286LVYG6w2UMqwSwj2Ef8LUec8b7Vejs-DsSS4WSJt1DtueqYM3eJ6Q_53lFIGVmF6-hFg0idHf4CvJWvPmbmADZ4aQtFr-2MeV4kidkd_J8ABI4mJRSDPlhY9dIcWQI3bUH6QlUp-L0QCSvUl_Mk65eN9bkAmGqbGEoe2UqKpbN14AlzWzh64k2XMGV5kdVatNOjAMVq_vSAiGPMmN3aT0lrs0LJx_mY0KAY; session-id-time=2082787201l; session-token=8T6XrSpLpllZIgr//Iy+o8uydDx2jfSsYJYwBatb8YqWTKir2Z7eEJmZXfLFZezthywpIt7fqHWD49vo3LwLYlAtylfCv0jtG6kbvzkkoVIbnACUmObE2Oxh+nsAP+8mBnYIFqehWz/nyhFR++ttMvRzEv7XORPZLyayWg1uodQkr1VELUFA9nscrWu4jV1ddAjCJtNiGZ+tVtyiBko4CNgSmoULvut8KJK4jxcOY4i9oEllRkwb9LcQEbTcZR1ImXFhgJHsNsoQj3A+8G7YJnNxnm0uGTJFQLSKl1UAZCXhcB/eeUTNMSwjZX9hs2fZ1V0fJGySl+aep8kP11XtpfFwJaNDSDdTjDXOOmU82twfkR4fvQiKZ7lhFy2LpJjK; x-acbin="4G6xVliVFAeX98UTadehjb7MmE5z8oYN0sEzDXgzaEG4Iljxe3LiVzblH59YMr@8"; rxc=AE4r77bCU4ZKg8g6JNE; csm-hit=tb:s-J8384YXCKKW4NB0SVD0G|1765386165249&t:1765386165249&adb:adblk_yes; session-token=K17Cp5rxLWR7115b4WKzIAZUE6C86AYXZvtfw2G4oTk9n5tGk/i7YaaeR6rFuuIWAK+yBTyoUk5xX0kop4DnUe1J9kSJjkZzDDpSc9QKULi452l9llO5ExbroCNbXCpGRHyU//iYjHiXlcxeR+oqmXszkZWd9VhvNqJ00OME7bDRc+qg2Bnb3Zuq2bFGB1sNomKhxkJ0afvTnHq7/g7357S9Jq8AFvyltEsb8dX3DAm+0VGwY7ijyBxyeV1vjP21+z2esJb0XLx7V2L7lk0uQkf35ZSHteqlOaOTp7g46GRuIA6mDZPCuH4yM81fbo+R/jjaNTgpiqPoe3aOufcLDR6vaQfYJbpooR4xQiIL2tThZsIg+N03SWjrhAApo/ZK; x-acbin="TnRI9s22z0cl4K61KIn@PP8CFjtW@nljsc9?1OXL9Tgybl0B?2Ya1LuTaGn2W1R4"';
+
+    const url =
+      "https://www.amazon.in/gp/product/ajax/twisterDimensionSlotsDefault";
+    const params = {
+      isDimensionSlotsAjax: "1",
+      asinList: code,
+      vs: "1",
+      asin: code,
+      productTypeDefinition: "CELLULAR_PHONE",
+      productGroupId: "premium_ce_brands_display_on_website",
+      parentAsin: parentAsin,
+      isPrime: "0",
+      qid: qid.toString(),
+      sr: "8-6",
+      keywords: "iphone+17",
+      deviceOs: "unrecognized",
+      landingAsin: code,
+      deviceType: "web",
+      showFancyPrice: "false",
+      twisterFlavor: "twisterPlusDesktopConfigurator",
+    };
+
+    const headers = {
+      accept: "text/html,*/*",
+      "accept-language": "en-US,en;q=0.7",
+      priority: "u=1, i",
+      referer: `https://www.amazon.in/dp/${code}`,
+      "sec-ch-ua": '"Brave";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+      "sec-ch-ua-platform-version": '"19.0.0"',
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      "sec-gpc": "1",
+      "user-agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "x-requested-with": "XMLHttpRequest",
+      Cookie: amazonCookie,
+    };
+
+    const res = await axios.get(url, {
+      params,
+      headers,
+      timeout: 15_000,
+    });
+
+    // Check if response is HTML error page (Amazon bot detection)
+    const responseData = res.data;
+    if (
+      typeof responseData === "string" &&
+      (responseData.includes("<!DOCTYPE html>") ||
+        responseData.includes("amazon.in/error") ||
+        responseData.includes("window.location.replace"))
+    ) {
+      throw new Error("Amazon returned HTML error page (bot detection)");
+    }
+
+    return responseData;
+  } catch (err) {
+    // Check if it's a retryable error (500, 503, or HTML error page)
+    const isRetryable =
+      (err.response &&
+        (err.response.status === 500 ||
+          err.response.status === 503 ||
+          err.response.status === 429)) ||
+      (err.message && err.message.includes("HTML error page"));
+
+    if (isRetryable && retryCount < maxRetries) {
+      // Exponential backoff with jitter
+      const delay = baseDelay * Math.pow(2, retryCount) + Math.random() * 1000; // Add random jitter (0-1s)
+      console.log(
+        `[Amazon Twister] Retryable error (${
+          err.response?.status || "HTML error"
+        }) for ASIN ${code}, retrying after ${Math.round(
+          delay
+        )}ms... (Attempt ${retryCount + 1}/${maxRetries})`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return amazonTwisterCustomRequest({
+        code,
+        axios,
+        retryCount: retryCount + 1,
+      });
+    }
+
+    // Non-retryable error or max retries reached
+    console.error(`[Amazon Twister] API error for ASIN ${code}:`, err.message);
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      if (err.response.data) {
+        const dataStr =
+          typeof err.response.data === "string"
+            ? err.response.data.substring(0, 200)
+            : JSON.stringify(err.response.data).substring(0, 200);
+        console.error("Response data:", dataStr);
+      }
+    }
+
+    // Return error indicator
+    return {
+      _error: true,
+      status: err.response?.status || "UNKNOWN_ERROR",
+      message: err.message,
+      retriesExhausted: retryCount >= maxRetries,
+    };
+  }
+};
+
 // Initialize custom requests
 attachCustomRequest("Croma", cromaCustomRequest);
 attachCustomRequest("Samsung", samsungCustomRequest);
-attachCustomRequest("Flipkart", flipkartCustomRequest);
+attachCustomRequest("Flipkart", flipkartSearchCustomRequest);
 attachCustomRequest("Reliance Digital", relianceDigitalCustomRequest);
 attachCustomRequest("iQOO", iqooCustomRequest);
 attachCustomRequest("Vivo", vivoCustomRequest);
-// attachCustomRequest("Amazon", amazonCustomRequest);
+attachCustomRequest("Unicorn", unicornCustomRequest);
+attachCustomRequest("Vijay Sales", vijaySalesCustomRequest);
+attachCustomRequest("Sangeetha", sangeethaCustomRequest);
+attachCustomRequest("OPPO", oppoCustomRequest);
+attachCustomRequest("Amazon", amazonTwisterCustomRequest);
+// attachCustomRequest("Amazon", amazonCustomRequest); // PAAPI v5 - disabled
 
 // Export for use in index.js
-export { applePickupCheck };
+export { applePickupCheck, flipkartSearchCustomRequest };
 
 // Note: Apple uses separate applePickupCheck function, not attached here

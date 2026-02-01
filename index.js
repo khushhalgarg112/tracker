@@ -6,9 +6,18 @@ import axios from "axios";
 dotenv.config();
 
 import { PINCODES, PLATFORMS } from "./config.js";
-import { callStockAPI, attachCustomRequest } from "./services/apiClient.js";
-import { applePickupCheck } from "./services/apiClient.js";
-import { sendTelegram } from "./services/telegramService.js";
+
+import {
+  callStockAPI,
+  attachCustomRequest,
+  applePickupCheck,
+  flipkartSearchCustomRequest,
+} from "./services/apiClient.js";
+import {
+  sendTelegram,
+  sendOppoTelegram,
+  sendAmazonTelegram,
+} from "./services/telegramService.js";
 
 /*
 How this runner works:
@@ -49,6 +58,9 @@ const getProductLink = (platformName, productId, productUrl) => {
   }
   if (platformName === "Vivo") {
     return `https://mshop.vivo.com/in/product/${productId}`;
+  }
+  if (platformName === "OPPO") {
+    return `https://www.oppo.com/in/product/find-x9`;
   }
   if (platformName === "Amazon") {
     return `https://www.amazon.in/dp/${productId}`;
@@ -203,7 +215,7 @@ const getSamsungAvailabilityDetails = (code, resData) => {
   return availabilityDetails;
 };
 
-// Helper function to get Flipkart availability details
+// Helper function to get Flipkart availability details (for individual product API)
 const getFlipkartAvailabilityDetails = (code, resData) => {
   try {
     const response = resData.RESPONSE?.[code];
@@ -235,6 +247,204 @@ const getFlipkartAvailabilityDetails = (code, resData) => {
     console.error("Response data:", JSON.stringify(resData, null, 2));
     return null;
   }
+};
+
+// Helper function to parse Flipkart search response and extract iPhone 17 256GB products
+const parseFlipkartSearchResponse = (resData) => {
+  const products = [];
+
+  try {
+    if (!resData || !resData.RESPONSE || !resData.RESPONSE.pageData) {
+      console.log("[Flipkart Search] Invalid response structure");
+      return products;
+    }
+
+    // iPhone 17 256GB product mapping (id, name, url)
+    const iphone17Products = [
+      {
+        id: "MOBHFN6YKGBPYJZD",
+        name: "Apple iPhone 17 (Lavender, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-lavender-256-gb/p/itmf37c8dffa4165?pid=MOBHFN6YKGBPYJZD&lid=LSTMOBHFN6YKGBPYJZDEZPBYP&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_19&otracker=search&otracker1=search&fm=search-autosuggest&iid=83397663-01ea-4654-b405-c51c2dab4d99.MOBHFN6YKGBPYJZD.SEARCH&ppt=sp&ppn=sp&ssid=71742qm8680000001765375401829&qH=c9eeb2d6cc488f0b",
+      },
+      {
+        id: "MOBHFN6YN2HXB5HE",
+        name: "Apple iPhone 17 (Black, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd?pid=MOBHFN6YN2HXB5HE&lid=LSTMOBHFN6YN2HXB5HER9QXGU&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_14&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YN2HXB5HE.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b",
+      },
+      {
+        id: "MOBHFN6YTSH3QRCZ",
+        name: "Apple iPhone 17 (White, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-white-256-gb/p/itmf98e89534d806?pid=MOBHFN6YTSH3QRCZ&lid=LSTMOBHFN6YTSH3QRCZYMRV03&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_16&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YTSH3QRCZ.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b",
+      },
+      {
+        id: "MOBHFN6YNAG4ZTHS",
+        name: "Apple iPhone 17 (Sage, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-sage-256-gb/p/itmcfa57eff7729c?pid=MOBHFN6YNAG4ZTHS&lid=LSTMOBHFN6YNAG4ZTHSWUQQUI&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_17&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YNAG4ZTHS.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b",
+      },
+      {
+        id: "MOBHFN6YWTXZD8SG",
+        name: "Apple iPhone 17 (Mist Blue, 256 GB)",
+        url: "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itm1834df7ee2812?pid=MOBHFN6YWTXZD8SG&lid=LSTMOBHFN6YWTXZD8SGROTZTS&marketplace=FLIPKART&q=iphone+17&store=tyy%2F4io&srno=s_1_18&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_ps&fm=search-autosuggest&iid=f6786d63-7195-4510-83f6-639e471bc3b9.MOBHFN6YWTXZD8SG.SEARCH&ppt=pp&ppn=pp&ssid=1hpd0b44kg0000001765731295530&qH=c9eeb2d6cc488f0b",
+      },
+    ];
+
+    // Create a map for quick lookup
+    const iphone17ProductMap = new Map(iphone17Products.map((p) => [p.id, p]));
+    const iphone17ProductIds = iphone17Products.map((p) => p.id);
+
+    console.log(
+      `[Flipkart Search] Tracking ${
+        iphone17ProductIds.length
+      } iPhone 17 256GB products: ${iphone17ProductIds.join(", ")}`
+    );
+    // Check both widgets and slots arrays (Flipkart may use either structure)
+    // Slots contain widgets, so we need to check both
+    let slots = resData.RESPONSE.slots || [];
+    console.log(
+      slots.length,
+      "-------------------------------------------------slots"
+    );
+    slots = slots.filter((slot) => slot?.widget);
+    console.log(
+      slots.length,
+      "-------------------------------------------------slots"
+    );
+
+    // Find ALL PRODUCT_SUMMARY widgets which contain product listings
+    let totalProductsChecked = 0;
+    const allProductsFound = []; // Track all products for logging
+
+    for (const slot of slots) {
+      if (slot.widget && slot.widget.type === "PRODUCT_SUMMARY") {
+        const widgetData = slot.widget.data;
+        if (
+          widgetData &&
+          widgetData.products &&
+          Array.isArray(widgetData.products)
+        ) {
+          console.log(
+            `[Flipkart Search] Processing widget with ${widgetData.products.length} products`
+          );
+          totalProductsChecked += widgetData.products.length;
+
+          for (const product of widgetData.products) {
+            if (product.productInfo && product.productInfo.value) {
+              const productValue = product.productInfo.value;
+
+              // Get productId from action.params.productId (primary) or value.id (fallback)
+              const productId =
+                product.addToWishlist.action?.params?.productId ||
+                productValue.id;
+
+              // Get title from titles object (preferred) or fallback to title field
+              const titles = productValue.titles || {};
+              const title =
+                titles.title || titles.newTitle || productValue.title || "";
+
+              const buyability = productValue.buyability || {};
+              const pricing = productValue.pricing || {};
+              const baseUrl = productValue.baseUrl || "";
+
+              // Log ALL products found
+              const isAvailable = buyability.intent === "positive";
+              const availabilityStatus = isAvailable
+                ? "✅ AVAILABLE"
+                : "❌ UNAVAILABLE";
+              const buyabilityMessage = buyability.message || "N/A";
+
+              console.log(
+                `[Flipkart Search] Product Found - ID: ${productId}, Title: ${title}, Status: ${availabilityStatus}, Message: ${buyabilityMessage}`
+              );
+
+              allProductsFound.push({
+                productId: productId,
+                title: title,
+                available: isAvailable,
+              });
+
+              // Check if this productId is in our tracking list (iPhone 17 256GB)
+              // Use productId matching instead of name matching for robustness
+              if (iphone17ProductIds.includes(productId)) {
+                const productInfo = iphone17ProductMap.get(productId);
+                console.log(
+                  `[Flipkart Search] ✅ MATCHED iPhone 17 256GB - ID: ${productId}, Title: ${title}, Available: ${isAvailable}`
+                );
+
+                const price =
+                  pricing.finalPrice?.decimalValue ||
+                  pricing.finalPrice?.value ||
+                  null;
+
+                // Use URL from mapping, fallback to constructed URL
+                const fullUrl =
+                  productInfo?.url ||
+                  (baseUrl.startsWith("http")
+                    ? baseUrl
+                    : `https://www.flipkart.com${baseUrl}`);
+
+                products.push({
+                  productId: productId,
+                  title: productInfo?.name || title, // Use name from mapping
+                  available: isAvailable,
+                  price: price,
+                  url: fullUrl,
+                  color: extractColorFromTitle(productInfo?.name || title),
+                  buyability: buyability, // Store buyability for reference
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    console.log(
+      `[Flipkart Search] Summary: Checked ${totalProductsChecked} total products, found ${allProductsFound.length} products, matched ${products.length} iPhone 17 256GB products`
+    );
+
+    // Log which tracked products were found and their status
+    console.log(`[Flipkart Search] Tracked Products Status:`);
+    for (const trackedId of iphone17ProductIds) {
+      const foundProduct = allProductsFound.find(
+        (p) => p.productId === trackedId
+      );
+      if (foundProduct) {
+        console.log(
+          `  ✅ ${trackedId} - ${foundProduct.title} - ${
+            foundProduct.available ? "AVAILABLE" : "UNAVAILABLE"
+          }`
+        );
+      } else {
+        console.log(`  ❌ ${trackedId} - NOT FOUND in search results`);
+      }
+    }
+  } catch (err) {
+    console.error("Error parsing Flipkart search response:", err.message);
+    console.error(err.stack);
+  }
+
+  return products;
+};
+
+// Helper function to extract color from product title
+const extractColorFromTitle = (title) => {
+  const colors = [
+    "Lavender",
+    "Black",
+    "White",
+    "Sage",
+    "Mist Blue",
+    "Deep Blue",
+    "Natural Titanium",
+  ];
+  const titleLower = title.toLowerCase();
+
+  for (const color of colors) {
+    if (titleLower.includes(color.toLowerCase())) {
+      return color;
+    }
+  }
+  return "Unknown";
 };
 
 // Helper function to get Reliance Digital availability details
@@ -286,6 +496,26 @@ const getIqooVivoAvailabilityDetails = (resData) => {
 // Helper function to get Amazon availability details
 const getAmazonAvailabilityDetails = (resData) => {
   try {
+    // Skip if this is an API error response
+    if (resData && resData._error === true) {
+      return null;
+    }
+
+    // Check for Twister API response format
+    if (resData && resData.Value && resData.Value.content) {
+      const twisterSlotJson = resData.Value.content.twisterSlotJson;
+      if (twisterSlotJson !== undefined) {
+        return {
+          available: twisterSlotJson.isAvailable === true,
+          message: twisterSlotJson.isAvailable
+            ? "Available"
+            : "Currently unavailable",
+          asin: resData.ASIN || null,
+        };
+      }
+    }
+
+    // Fallback to PAAPI v5 format (if used)
     const items = resData.ItemsResult?.Items || [];
     if (items.length === 0) return null;
 
@@ -305,8 +535,117 @@ const getAmazonAvailabilityDetails = (resData) => {
   }
 };
 
+// Helper function to get Unicorn availability details
+const getUnicornAvailabilityDetails = (resData) => {
+  try {
+    const product = resData?.data?.product;
+    if (!product) return null;
+
+    const quantity = Number(product.quantity) || 0;
+    const price = Number(product.price);
+
+    return {
+      available: quantity > 0,
+      quantity,
+      price: Number.isFinite(price) ? price : null,
+      sku: product.sku,
+      dispatchNote: product.custom_column_4 || null,
+    };
+  } catch (err) {
+    console.error("Error parsing Unicorn availability:", err.message);
+    return null;
+  }
+};
+
+// Helper function to get Vijay Sales availability details
+const getVijaySalesAvailabilityDetails = (code, resData) => {
+  try {
+    const productData = resData?.data?.[String(code)];
+    if (!productData) return null;
+
+    const pickupList = Array.isArray(productData.storePickupList)
+      ? productData.storePickupList
+      : [];
+
+    const delivery = productData.isServiceable === true;
+    const pickup = pickupList.length > 0;
+
+    return {
+      available: delivery || pickup,
+      delivery,
+      pickup,
+      pickupList,
+    };
+  } catch (err) {
+    console.error("Error parsing Vijay Sales availability:", err.message);
+    return null;
+  }
+};
+
+// Helper function to get Sangeetha availability details
+const getSangeethaAvailabilityDetails = (resData) => {
+  try {
+    // Handle error responses (e.g., 500 errors)
+    if (resData?.error === true) {
+      console.error(
+        `[Sangeetha] Error response: ${resData.message || "Unknown error"}`
+      );
+      return null;
+    }
+
+    const eta = resData?.data?.product_eta;
+    if (!eta) return null;
+
+    const inStock = (eta.stock_status || "").toLowerCase() === "instock";
+    return {
+      available: inStock,
+      etaTitle: eta.eta_title || null,
+      etaMessage: eta.eta_message || null,
+    };
+  } catch (err) {
+    console.error("Error parsing Sangeetha availability:", err.message);
+    return null;
+  }
+};
+
+// Helper function to get OPPO availability details
+const getOppoAvailabilityDetails = (resData) => {
+  try {
+    if (!resData || !resData.success || !resData.data) return null;
+
+    const products = resData.data.products || [];
+    const inStockProducts = [];
+
+    for (const product of products) {
+      // Check stockStatus: 1 = in stock, 0 = out of stock
+      if (product.stockStatus === 1) {
+        inStockProducts.push({
+          skuCode: product.skuCode,
+          name: product.name,
+          cnName: product.cnName,
+          imageUrl: product.imageUrl,
+          stockStatus: product.stockStatus,
+        });
+      }
+    }
+
+    return {
+      available: inStockProducts.length > 0,
+      inStockProducts,
+      totalProducts: products.length,
+    };
+  } catch (err) {
+    console.error("Error parsing OPPO availability:", err.message);
+    return null;
+  }
+};
+
 const detectAvailability = (platformName, code, pincode, resData) => {
-  if (!resData) return false;
+  // Check for API errors - don't treat errors as "no stock"
+  if (!resData || resData._error === true) {
+    // Return null to indicate "unknown" status (not false for "no stock")
+    return null;
+  }
 
   // Apple-specific detection
   if (platformName === "Apple") {
@@ -364,6 +703,27 @@ const detectAvailability = (platformName, code, pincode, resData) => {
   // Amazon-specific detection
   if (platformName === "Amazon") {
     const availabilityDetails = getAmazonAvailabilityDetails(resData);
+    return availabilityDetails?.available === true;
+  }
+
+  if (platformName === "Unicorn") {
+    const availabilityDetails = getUnicornAvailabilityDetails(resData);
+    return availabilityDetails?.available === true;
+  }
+
+  if (platformName === "Vijay Sales") {
+    const availabilityDetails = getVijaySalesAvailabilityDetails(code, resData);
+    return availabilityDetails?.available === true;
+  }
+
+  if (platformName === "Sangeetha") {
+    const availabilityDetails = getSangeethaAvailabilityDetails(resData);
+    return availabilityDetails?.available === true;
+  }
+
+  // OPPO-specific detection
+  if (platformName === "OPPO") {
+    const availabilityDetails = getOppoAvailabilityDetails(resData);
     return availabilityDetails?.available === true;
   }
 
@@ -477,9 +837,76 @@ const checkAppleStock = async () => {
   }
 };
 
-// Separate function to check platforms without pincode (iQOO, Vivo)
+// Separate function to check Flipkart search for iPhone 17 256GB
+const checkFlipkartSearch = async () => {
+  try {
+    console.log("[Flipkart Search] Checking iPhone 17 256GB stock...");
+
+    const searchData = await flipkartSearchCustomRequest({ axios });
+
+    if (!searchData) {
+      console.log("[Flipkart Search] No data received from API");
+      return;
+    }
+
+    const products = parseFlipkartSearchResponse(searchData);
+    console.log(
+      `[Flipkart Search] Found ${products.length} iPhone 17 256GB products`
+    );
+
+    for (const product of products) {
+      if (product.available) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+        const timeStr = now.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        });
+
+        let text = `🎉 *iPhone 17 256GB STOCK AVAILABLE!* 🎉\n\n`;
+        text += `📱 ${product.title}\n`;
+        text += `🎨 Color: ${product.color}\n`;
+        text += `💾 Storage: 256 GB\n`;
+
+        if (product.price) {
+          const priceNum = parseFloat(product.price);
+          text += `💰 Price: ₹${priceNum.toLocaleString("en-IN")}\n`;
+        }
+
+        // Add buyability message if available (for additional context)
+        if (product.buyability && product.buyability.message) {
+          text += `\n📝 Status: ${product.buyability.message}\n`;
+        }
+
+        text += `\n🔗 [Buy Now](${product.url})\n\n`;
+        text += `⏰ ${dateStr}, ${timeStr}\n\n`;
+        text += `🏃‍♂️ Hurry! Stock may be limited!`;
+
+        console.log(
+          `ALERT -> Flipkart Search: ${product.productId} - ${product.title}`
+        );
+        await sendTelegram(text);
+        await sleep(500); // Small delay between alerts
+      } else {
+        console.log(
+          `[Flipkart Search] No stock: ${product.productId} - ${product.title}`
+        );
+      }
+    }
+  } catch (err) {
+    console.error("Error checking Flipkart search:", err.message);
+  }
+};
+
+// Separate function to check platforms without pincode (iQOO, Vivo, Unicorn, OPPO, Amazon)
 const checkPlatformsWithoutPincode = async () => {
-  const platformsWithoutPincode = ["iQOO", "Vivo"]; // Removed "Amazon" - disabled
+  const platformsWithoutPincode = ["iQOO", "Vivo", "Unicorn", "OPPO", "Amazon"];
 
   for (const platform of PLATFORMS) {
     if (!platformsWithoutPincode.includes(platform.name)) continue;
@@ -508,6 +935,15 @@ const checkPlatformsWithoutPincode = async () => {
           data
         );
 
+        // Skip if API error (available === null means error/unknown)
+        if (available === null) {
+          console.log(
+            `⚠️ API error - skipping stock check: ${platform.name} ${productId}`
+          );
+          await sleep(1000);
+          continue;
+        }
+
         if (available) {
           const productLink = getProductLink(
             platform.name,
@@ -516,14 +952,58 @@ const checkPlatformsWithoutPincode = async () => {
           );
           let text = `✅ *Stock Alert*\nPlatform: ${platform.name}\nProduct: [${productName}](${productLink})\n`;
 
+          if (platform.name === "Unicorn") {
+            const details = getUnicornAvailabilityDetails(data);
+            if (details) {
+              if (details.price) {
+                text += `💰 Price: ₹${details.price.toLocaleString("en-IN")}\n`;
+              }
+              text += `📦 Quantity: ${details.quantity ?? "N/A"}\n`;
+              if (details.sku) {
+                text += `SKU: ${details.sku}\n`;
+              }
+            }
+          } else if (platform.name === "OPPO") {
+            const details = getOppoAvailabilityDetails(data);
+            if (details && details.inStockProducts.length > 0) {
+              text += `\n📦 *Available Variants:*\n`;
+              for (const variant of details.inStockProducts) {
+                text += `\n• ${variant.name || variant.cnName}\n`;
+              }
+              text += `\nTotal: ${details.inStockProducts.length} variant(s) in stock`;
+            }
+          } else if (platform.name === "Amazon") {
+            const details = getAmazonAvailabilityDetails(data);
+            if (details) {
+              text += `\n📦 Status: ${details.message || "Available"}\n`;
+              if (details.asin) {
+                text += `ASIN: ${details.asin}\n`;
+              }
+            }
+          }
+
           console.log("ALERT ->", platform.name, productId);
-          await sendTelegram(text);
+
+          // Use platform-specific Telegram channel if available
+          if (platform.name === "OPPO") {
+            await sendOppoTelegram(text);
+          } else if (platform.name === "Amazon") {
+            await sendAmazonTelegram(text);
+          } else {
+            await sendTelegram(text);
+          }
           await sleep(500);
         } else {
           console.log("No stock:", platform.name, productId);
         }
 
-        await sleep(1000); // Delay between products
+        // Longer delay for Amazon to avoid rate limiting (3-5 seconds random)
+        if (platform.name === "Amazon") {
+          const amazonDelay = 3000 + Math.random() * 2000; // 3-5 seconds
+          await sleep(amazonDelay);
+        } else {
+          await sleep(1000); // Standard delay for other platforms
+        }
       } catch (err) {
         console.error("Error checking", platform.name, productId, err.message);
         await sleep(1000);
@@ -535,16 +1015,59 @@ const checkPlatformsWithoutPincode = async () => {
 const checkStock = async () => {
   console.log("Starting stock sweep at", new Date().toISOString());
 
+  // Check if Croma has no products configured, then call external API
+  const cromaPlatform = PLATFORMS.find((p) => p.name === "Croma");
+  if (cromaPlatform && cromaPlatform.products.length === 0) {
+    console.log("\n🔍 Croma products length is 0 - calling external API...");
+    try {
+      const response = await axios.post(
+        "https://inventory-rho-ten.vercel.app/api/cron"
+      );
+      console.log("✅ External Croma API called successfully (POST)");
+      console.log("   Response:", response.data);
+    } catch (err) {
+      console.error("❌ Error calling external Croma API:", err.message);
+      if (err.response) {
+        console.error("   Status:", err.response.status);
+        console.error("   Data:", err.response.data);
+      }
+    }
+  }
+
+  // BigBasket search tracking - DISABLED (CORS/Access Denied issues)
+  // console.log("\n🔍 Calling external BigBasket API...");
+  // try {
+  //   const response = await axios.post(
+  //     "https://inventory-rho-ten.vercel.app/api/bigbasket"
+  //   );
+  //   console.log("✅ External BigBasket API called successfully (POST)");
+  //   console.log("   Response:", response.data);
+  // } catch (err) {
+  //   console.error("❌ Error calling external BigBasket API:", err.message);
+  //   if (err.response) {
+  //     console.error("   Status:", err.response.status);
+  //     console.error("   Data:", err.response.data);
+  //   }
+  // }
+
   // Check Apple separately (no pincode iteration) - DISABLED
   // await checkAppleStock();
 
-  // Check platforms without pincode (iQOO, Vivo) - Amazon disabled
+  // Check Flipkart search for iPhone 17 256GB
+  // await checkFlipkartSearch();
+
+  // Check platforms without pincode (iQOO, Vivo, Unicorn) - Amazon disabled
   await checkPlatformsWithoutPincode();
 
   // Check other platforms with pincode iteration
   for (const platform of PLATFORMS) {
-    // Skip Apple, Amazon as they're disabled, and iQOO, Vivo as they're handled separately
-    if (["Apple", "Amazon", "iQOO", "Vivo"].includes(platform.name)) continue;
+    // Skip Apple as it's disabled, and iQOO, Vivo, Unicorn, OPPO, Amazon as they're handled separately
+    if (
+      ["Apple", "iQOO", "Vivo", "Unicorn", "OPPO", "Amazon"].includes(
+        platform.name
+      )
+    )
+      continue;
 
     // Also skip if platform has no products
     if (!platform.products || platform.products.length === 0) continue;
@@ -712,6 +1235,32 @@ const checkStock = async () => {
               );
               if (details?.errorMessage) {
                 text += `\n⚠️ Note: ${details.errorMessage}`;
+              }
+            }
+            // For Vijay Sales
+            else if (platform.name === "Vijay Sales") {
+              const details = getVijaySalesAvailabilityDetails(productId, data);
+              if (details) {
+                text += `\n📦 Delivery: ${details.delivery ? "YES" : "NO"}`;
+                text += `\n🏬 Pickup: ${details.pickup ? "YES" : "NO"}`;
+                if (details.pickupList?.length) {
+                  const store = details.pickupList[0];
+                  text += `\nStore: ${
+                    store.storeName || store.store_name || "N/A"
+                  }`;
+                }
+              }
+            }
+            // For Sangeetha
+            else if (platform.name === "Sangeetha") {
+              const details = getSangeethaAvailabilityDetails(data);
+              if (details) {
+                if (details.etaTitle) {
+                  text += `\nETA: ${details.etaTitle}`;
+                }
+                if (details.etaMessage) {
+                  text += `\n${details.etaMessage}`;
+                }
               }
             } else {
               text += `\nResponse: ${JSON.stringify(data)}`;

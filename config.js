@@ -396,31 +396,31 @@ export const PLATFORMS = [
     apiKey: null,
     pincodes: ["122001", "110005"], // Uses shared pincodes
     products: [
-      {
-        id: "245181",
-        name: "iPhone 17 Mist Blue 256GB",
-        url: "https://www.vijaysales.com/p/P245179/245181/apple-iphone-17-256gb-storage-mist-blue",
-      },
-      {
-        id: "245179",
-        name: "iPhone 17 Black 256GB",
-        url: "https://www.vijaysales.com/p/P245179/245179/apple-iphone-17-256gb-storage-black",
-      },
-      {
-        id: "245180",
-        name: "iPhone 17 White 256GB",
-        url: "https://www.vijaysales.com/p/P245179/245180/apple-iphone-17-256gb-storage-white",
-      },
-      {
-        id: "245182",
-        name: "iPhone 17 Lavender 256GB",
-        url: "https://www.vijaysales.com/p/P245179/245182/apple-iphone-17-256gb-storage-lavender",
-      },
-      {
-        id: "245183",
-        name: "iPhone 17 Sage 256GB",
-        url: "https://www.vijaysales.com/p/P245179/245183/apple-iphone-17-256gb-storage-sage",
-      },
+      // {
+      //   id: "245181",
+      //   name: "iPhone 17 Mist Blue 256GB",
+      //   url: "https://www.vijaysales.com/p/P245179/245181/apple-iphone-17-256gb-storage-mist-blue",
+      // },
+      // {
+      //   id: "245179",
+      //   name: "iPhone 17 Black 256GB",
+      //   url: "https://www.vijaysales.com/p/P245179/245179/apple-iphone-17-256gb-storage-black",
+      // },
+      // {
+      //   id: "245180",
+      //   name: "iPhone 17 White 256GB",
+      //   url: "https://www.vijaysales.com/p/P245179/245180/apple-iphone-17-256gb-storage-white",
+      // },
+      // {
+      //   id: "245182",
+      //   name: "iPhone 17 Lavender 256GB",
+      //   url: "https://www.vijaysales.com/p/P245179/245182/apple-iphone-17-256gb-storage-lavender",
+      // },
+      // {
+      //   id: "245183",
+      //   name: "iPhone 17 Sage 256GB",
+      //   url: "https://www.vijaysales.com/p/P245179/245183/apple-iphone-17-256gb-storage-sage",
+      // },
     ],
   },
   {
@@ -431,31 +431,31 @@ export const PLATFORMS = [
     apiKey: null,
     pincodes: ["122001", "110005"],
     products: [
-      {
-        id: "19685",
-        name: "iPhone 17 Sage 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19685",
-      },
-      {
-        id: "19681",
-        name: "iPhone 17 Lavender 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19681",
-      },
-      {
-        id: "19678",
-        name: "iPhone 17 White 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19678",
-      },
-      {
-        id: "19680",
-        name: "iPhone 17 Black 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19680",
-      },
-      {
-        id: "19683",
-        name: "iPhone 17 Mist Blue 256GB",
-        url: "https://www.sangeethamobiles.com/product-details/19683",
-      },
+      // {
+      //   id: "19685",
+      //   name: "iPhone 17 Sage 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19685",
+      // },
+      // {
+      //   id: "19681",
+      //   name: "iPhone 17 Lavender 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19681",
+      // },
+      // {
+      //   id: "19678",
+      //   name: "iPhone 17 White 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19678",
+      // },
+      // {
+      //   id: "19680",
+      //   name: "iPhone 17 Black 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19680",
+      // },
+      // {
+      //   id: "19683",
+      //   name: "iPhone 17 Mist Blue 256GB",
+      //   url: "https://www.sangeethamobiles.com/product-details/19683",
+      // },
     ],
   },
   {

@@ -1021,7 +1021,7 @@ const checkStock = async () => {
     console.log("\n🔍 Croma products length is 0 - calling external API...");
     try {
       const response = await axios.post(
-        "https://inventoryu.vercel.app/api/cron"
+        "https://inventory-rho-ten.vercel.app/api/cron"
       );
       console.log("✅ External Croma API called successfully (POST)");
       console.log("   Response:", response.data);

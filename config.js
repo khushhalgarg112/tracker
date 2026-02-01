@@ -332,9 +332,9 @@ export const PLATFORMS = [
     method: "POST",
     apiKey: null,
     pincodes: ["122001", "110005"], // No pincode iteration for Unicorn
-    storageOptionId: "250",
-    categoryId: "456",
-    familyId: "94",
+    storageOptionId: "249",
+    categoryId: "321",
+    familyId: "89",
     groupIds: "57,58",
     products: [
       // {

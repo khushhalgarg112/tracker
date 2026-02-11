@@ -193,41 +193,41 @@ export const PLATFORMS = [
       //   name: "Apple iPhone 17 256 GB, Sage",
       //   url: "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-sage-mff8s3-9391641?internal_source=search_collection",
       // },
-      {
-        id: "493839329",
-        name: "Apple iPhone 15 Plus 256 GB, Black",
-        url: "https://www.reliancedigital.in/product/apple-iphone-15-plus-256-gb-black-lmj3i9-7533823?internal_source=search_results",
-      },
-      {
-        id: "493839328",
-        name: "Apple iPhone 15 Plus 128 GB, Green",
-        url: "https://www.reliancedigital.in/product/apple-iphone-15-plus-128-gb-green-lmj3id-7533828?internal_source=search_results",
-      },
-      {
-        id: "494423015",
-        name: "Apple iPhone 16",
-        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-pink-m0xrri-8590261?internal_source=search_collection",
-      },
-      {
-        id: "494423014",
-        name: "Apple iPhone 16",
-        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-white-m0xrsw-8590290?internal_source=search_collection",
-      },
-      {
-        id: "494423013",
-        name: "Apple iPhone 16",
-        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-black-m0xrrm-8590265?internal_source=search_collection",
-      },
-      {
-        id: "494423016",
-        name: "Apple iPhone 16",
-        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-ultramarine-m0xrrm-8590264?internal_source=search_collection",
-      },
-      {
-        id: "494423017",
-        name: "Apple iPhone 16",
-        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-teal-m0xrss-8590284?internal_source=search_collection",
-      },
+      // {
+      //   id: "493839329",
+      //   name: "Apple iPhone 15 Plus 256 GB, Black",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-15-plus-256-gb-black-lmj3i9-7533823?internal_source=search_results",
+      // },
+      // {
+      //   id: "493839328",
+      //   name: "Apple iPhone 15 Plus 128 GB, Green",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-15-plus-128-gb-green-lmj3id-7533828?internal_source=search_results",
+      // },
+      // {
+      //   id: "494423015",
+      //   name: "Apple iPhone 16",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-pink-m0xrri-8590261?internal_source=search_collection",
+      // },
+      // {
+      //   id: "494423014",
+      //   name: "Apple iPhone 16",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-white-m0xrsw-8590290?internal_source=search_collection",
+      // },
+      // {
+      //   id: "494423013",
+      //   name: "Apple iPhone 16",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-black-m0xrrm-8590265?internal_source=search_collection",
+      // },
+      // {
+      //   id: "494423016",
+      //   name: "Apple iPhone 16",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-ultramarine-m0xrrm-8590264?internal_source=search_collection",
+      // },
+      // {
+      //   id: "494423017",
+      //   name: "Apple iPhone 16",
+      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-teal-m0xrss-8590284?internal_source=search_collection",
+      // },
       // {
       //   id: "494494547",
       //   name: "Pixel 9A Obsidian",

@@ -228,6 +228,31 @@ export const PLATFORMS = [
       //   name: "Apple iPhone 16",
       //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-teal-m0xrss-8590284?internal_source=search_collection",
       // },
+      {
+        id: "494423020",
+        name: "Apple iPhone 16 256GB Pink",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-256-gb-pink-m0xrrq-8590271",
+      },
+      {
+        id: "494423019",
+        name: "Apple iPhone 16 256GB White",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-256-gb-white-m0xrrq-8590270",
+      },
+      {
+        id: "494423018",
+        name: "Apple iPhone 16 256GB Black",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-256-gb-black-m0xrrm-8590263",
+      },
+      {
+        id: "494423021",
+        name: "Apple iPhone 16 256GB Ultramarine",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-256-gb-ultramarine-m0xrrm-8590266?internal_source=search_results",
+      },
+      {
+        id: "494423022",
+        name: "Apple iPhone 16 256GB Teal",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-256-gb-teal-m0xrrr-8590275?internal_source=search_results",
+      },
       // {
       //   id: "494494547",
       //   name: "Pixel 9A Obsidian",

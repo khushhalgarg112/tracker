@@ -166,7 +166,7 @@ export const PLATFORMS = [
       "https://www.reliancedigital.in/ext/raven-api/inventory/multi/articles-v2",
     method: "POST",
     apiKey: null,
-    pincodes: ["122001", "485001"], // Multiple pincodes for Reliance Digital
+    pincodes: ["122001", "485001", "110017", "110016"], // Multiple pincodes for Reliance Digital
     products: [
       // {
       //   id: "494741625",

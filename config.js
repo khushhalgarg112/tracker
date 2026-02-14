@@ -253,6 +253,46 @@ export const PLATFORMS = [
         name: "Apple iPhone 16 256GB Teal",
         url: "https://www.reliancedigital.in/product/apple-iphone-16-256-gb-teal-m0xrrr-8590275?internal_source=search_results",
       },
+      {
+        id: "494423061",
+        name: "Apple iPhone 16 Pro Max 256 GB, Desert Titanium",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-pro-max-256-gb-desert-titanium-m0xqp8-8590113",
+      },
+      {
+        id: "494423059",
+        name: "Apple iPhone 16 Pro Max 256 GB, Black Titanium",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-pro-max-256-gb-black-titanium-m0xqpc-8590116",
+      },
+      {
+        id: "494423060",
+        name: "Apple iPhone 16 Pro Max 256 GB, White Titanium",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-pro-max-256-gb-white-titanium-m0xqp8-8590112",
+      },
+      {
+        id: "494423062",
+        name: "Apple iPhone 16 Pro Max 256 GB, Natural Titanium",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-pro-max-256-gb-natural-titanium-m0xqvi-8590122",
+      },
+      {
+        id: "494423065",
+        name: "Apple iPhone 16 Pro Max 512 GB, Desert Titanium",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-pro-max-256-gb-desert-titanium-m0xqp8-8590113",
+      },
+      {
+        id: "494423063",
+        name: "Apple iPhone 16 Pro Max 512 GB, Black Titanium",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-pro-max-256-gb-black-titanium-m0xqpc-8590116",
+      },
+      {
+        id: "494423064",
+        name: "Apple iPhone 16 Pro Max 512 GB, White Titanium",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-pro-max-256-gb-white-titanium-m0xqp8-8590112",
+      },
+      {
+        id: "494423066",
+        name: "Apple iPhone 16 Pro Max 512 GB, Natural Titanium",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-pro-max-512-gb-natural-titanium-m0xqvr-8590128",
+      },
       // {
       //   id: "494494547",
       //   name: "Pixel 9A Obsidian",

@@ -203,31 +203,31 @@ export const PLATFORMS = [
       //   name: "Apple iPhone 15 Plus 128 GB, Green",
       //   url: "https://www.reliancedigital.in/product/apple-iphone-15-plus-128-gb-green-lmj3id-7533828?internal_source=search_results",
       // },
-      // {
-      //   id: "494423015",
-      //   name: "Apple iPhone 16",
-      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-pink-m0xrri-8590261?internal_source=search_collection",
-      // },
-      // {
-      //   id: "494423014",
-      //   name: "Apple iPhone 16",
-      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-white-m0xrsw-8590290?internal_source=search_collection",
-      // },
-      // {
-      //   id: "494423013",
-      //   name: "Apple iPhone 16",
-      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-black-m0xrrm-8590265?internal_source=search_collection",
-      // },
-      // {
-      //   id: "494423016",
-      //   name: "Apple iPhone 16",
-      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-ultramarine-m0xrrm-8590264?internal_source=search_collection",
-      // },
-      // {
-      //   id: "494423017",
-      //   name: "Apple iPhone 16",
-      //   url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-teal-m0xrss-8590284?internal_source=search_collection",
-      // },
+      {
+        id: "494423015",
+        name: "Apple iPhone 16",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-pink-m0xrri-8590261?internal_source=search_collection",
+      },
+      {
+        id: "494423014",
+        name: "Apple iPhone 16",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-white-m0xrsw-8590290?internal_source=search_collection",
+      },
+      {
+        id: "494423013",
+        name: "Apple iPhone 16",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-black-m0xrrm-8590265?internal_source=search_collection",
+      },
+      {
+        id: "494423016",
+        name: "Apple iPhone 16",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-ultramarine-m0xrrm-8590264?internal_source=search_collection",
+      },
+      {
+        id: "494423017",
+        name: "Apple iPhone 16",
+        url: "https://www.reliancedigital.in/product/apple-iphone-16-128-gb-teal-m0xrss-8590284?internal_source=search_collection",
+      },
       {
         id: "494423020",
         name: "Apple iPhone 16 256GB Pink",

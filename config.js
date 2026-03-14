@@ -338,11 +338,11 @@ export const PLATFORMS = [
     products: [
       //  { id: "10297", name: "X200 12GB+256GB Natural Green", url: "https://shop.vivo.com/in/product/10297?utm_source=website&utm_medium=mainbanner&utm_campaign=x200launch&cid=noPreload&_ga=2.163479356.1656843844.1763283692-1348449134.1763283692&_gl=1%2aloo18t%2a_ga%2aMTM0ODQ0OTEzNC4xNzYzMjgzNjky%2a_ga_68BLCXM546%2aczE3NjMyODM2OTIkbzEkZzEkdDE3NjMyODM2OTYkajU2JGwwJGgw" },
       //  { id: "10320", name: "V60 8GB+128GB Mist Gray", url: "https://shop.vivo.com/in/product/10320?utm_source=website%20&utm_medium=mainbanner&utm_campaign=vivo_v60"},
-      // {
-      //   id: "10321",
-      //   name: "T4 Pro",
-      //   url: "https://mshop.vivo.com/in/product/10321?skuId=19266&utm_source=exspace&utm_medium=search&utm_campaign=searchResult&utm_term=slot0&utm_content=T4%20Pro%09%09&cid=exspace_search_searchResult_slot0_T4%20Pro%09%09",
-      // },
+      {
+        id: "10314",
+        name: "T4 Lite",
+        url: "https://shop.vivo.com/in/product/10314?skuId=19197",
+      },
     ],
   },
   {
